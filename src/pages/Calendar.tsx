@@ -17,23 +17,11 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filters, setFilters] = useState<CalendarFiltersType>({});
 
-  if (postsLoading || profilesLoading || productsLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3">
-            <Skeleton className="h-96" />
-          </div>
-          <Skeleton className="h-96" />
-        </div>
-      </div>
-    );
-  }
-
+  // Move all useMemo hooks before any conditional returns
   // Filter posts based on current filters
   const filteredPosts = useMemo(() => {
-    return posts?.filter(post => {
+    if (!posts) return [];
+    return posts.filter(post => {
       if (filters.profileId && post.profileId !== filters.profileId) return false;
       if (filters.status && post.status !== filters.status) return false;
       if (filters.contentType && post.contentType !== filters.contentType) return false;
@@ -42,13 +30,14 @@ const Calendar = () => {
         if (profile?.platform !== filters.platform) return false;
       }
       return true;
-    }) || [];
+    });
   }, [posts, filters, activeProfiles]);
 
   // Get posts for selected date
-  const selectedDatePosts = selectedDate 
-    ? filteredPosts.filter(post => isSameDay(new Date(post.date), selectedDate))
-    : [];
+  const selectedDatePosts = useMemo(() => {
+    if (!selectedDate) return [];
+    return filteredPosts.filter(post => isSameDay(new Date(post.date), selectedDate));
+  }, [selectedDate, filteredPosts]);
 
   const getPostsForDay = (day: Date) => {
     return filteredPosts.filter(post => isSameDay(new Date(post.date), day));
@@ -63,6 +52,21 @@ const Calendar = () => {
     const product = products?.find(p => p.id === productId);
     return product ? product.name : 'Producto no encontrado';
   };
+
+  // Now check for loading states after all hooks are called
+  if (postsLoading || profilesLoading || productsLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-64" />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3">
+            <Skeleton className="h-96" />
+          </div>
+          <Skeleton className="h-96" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

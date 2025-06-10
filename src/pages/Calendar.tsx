@@ -39,10 +39,10 @@ const Calendar = () => {
   // Filter posts based on current filters
   const filteredPosts = useMemo(() => {
     return posts?.filter(post => {
-      if (filters.profileId && post.profileId !== filters.profileId) return false;
-      if (filters.status && post.status !== filters.status) return false;
-      if (filters.contentType && post.contentType !== filters.contentType) return false;
-      if (filters.platform) {
+      if (filters.profileId && filters.profileId !== 'all' && post.profileId !== filters.profileId) return false;
+      if (filters.status && filters.status !== 'all' && post.status !== filters.status) return false;
+      if (filters.contentType && filters.contentType !== 'all' && post.contentType !== filters.contentType) return false;
+      if (filters.platform && filters.platform !== 'all') {
         const profile = activeProfiles?.find(p => p.id === post.profileId);
         if (profile?.platform !== filters.platform) return false;
       }
@@ -195,14 +195,14 @@ const Calendar = () => {
               <div>
                 <label className="text-sm font-medium">Perfil</label>
                 <Select 
-                  value={filters.profileId || ''} 
-                  onValueChange={(value) => setFilters(prev => ({ ...prev, profileId: value || undefined }))}
+                  value={filters.profileId || 'all'} 
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, profileId: value === 'all' ? undefined : value }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Todos los perfiles" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los perfiles</SelectItem>
+                    <SelectItem value="all">Todos los perfiles</SelectItem>
                     {activeProfiles?.map((profile) => (
                       <SelectItem key={profile.id} value={profile.id}>
                         {profile.name} ({profile.platform})
@@ -215,14 +215,14 @@ const Calendar = () => {
               <div>
                 <label className="text-sm font-medium">Estado</label>
                 <Select 
-                  value={filters.status || ''} 
-                  onValueChange={(value: PostStatus | '') => setFilters(prev => ({ ...prev, status: value || undefined }))}
+                  value={filters.status || 'all'} 
+                  onValueChange={(value: PostStatus | 'all') => setFilters(prev => ({ ...prev, status: value === 'all' ? undefined : value as PostStatus }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Todos los estados" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los estados</SelectItem>
+                    <SelectItem value="all">Todos los estados</SelectItem>
                     <SelectItem value="Pending">Pendiente</SelectItem>
                     <SelectItem value="Approved">Aprobada</SelectItem>
                     <SelectItem value="Published">Publicada</SelectItem>
@@ -234,14 +234,14 @@ const Calendar = () => {
               <div>
                 <label className="text-sm font-medium">Tipo</label>
                 <Select 
-                  value={filters.contentType || ''} 
-                  onValueChange={(value: ContentType | '') => setFilters(prev => ({ ...prev, contentType: value || undefined }))}
+                  value={filters.contentType || 'all'} 
+                  onValueChange={(value: ContentType | 'all') => setFilters(prev => ({ ...prev, contentType: value === 'all' ? undefined : value as ContentType }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Todos los tipos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los tipos</SelectItem>
+                    <SelectItem value="all">Todos los tipos</SelectItem>
                     <SelectItem value="Post">Post</SelectItem>
                     <SelectItem value="Reel">Reel</SelectItem>
                     <SelectItem value="Story">Story</SelectItem>

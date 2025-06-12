@@ -9,7 +9,192 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      general_info: {
+        Row: {
+          id: string
+          media_kit: Json | null
+          protocols: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          media_kit?: Json | null
+          protocols?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          media_kit?: Json | null
+          protocols?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      media_resources: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          format: string | null
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["media_type"]
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          format?: string | null
+          id?: string
+          name: string
+          type: Database["public"]["Enums"]["media_type"]
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          format?: string | null
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["media_type"]
+          url?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          briefing: string | null
+          communication_kit_url: string | null
+          countries: string[] | null
+          created_at: string | null
+          creative_concept: string | null
+          description: string | null
+          hashtags: string[] | null
+          id: string
+          landing_url: string | null
+          name: string
+          sales_objectives: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          briefing?: string | null
+          communication_kit_url?: string | null
+          countries?: string[] | null
+          created_at?: string | null
+          creative_concept?: string | null
+          description?: string | null
+          hashtags?: string[] | null
+          id?: string
+          landing_url?: string | null
+          name: string
+          sales_objectives?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          briefing?: string | null
+          communication_kit_url?: string | null
+          countries?: string[] | null
+          created_at?: string | null
+          creative_concept?: string | null
+          description?: string | null
+          hashtags?: string[] | null
+          id?: string
+          landing_url?: string | null
+          name?: string
+          sales_objectives?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      social_posts: {
+        Row: {
+          content_format: string | null
+          content_type: Database["public"]["Enums"]["content_type"]
+          copies: Json | null
+          created_at: string | null
+          hashtags: string[] | null
+          id: string
+          media_resources_ids: string[] | null
+          post_date: string
+          product_id: string | null
+          profile_id: string | null
+          status: Database["public"]["Enums"]["post_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_format?: string | null
+          content_type: Database["public"]["Enums"]["content_type"]
+          copies?: Json | null
+          created_at?: string | null
+          hashtags?: string[] | null
+          id?: string
+          media_resources_ids?: string[] | null
+          post_date: string
+          product_id?: string | null
+          profile_id?: string | null
+          status?: Database["public"]["Enums"]["post_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_format?: string | null
+          content_type?: Database["public"]["Enums"]["content_type"]
+          copies?: Json | null
+          created_at?: string | null
+          hashtags?: string[] | null
+          id?: string
+          media_resources_ids?: string[] | null
+          post_date?: string
+          product_id?: string | null
+          profile_id?: string | null
+          status?: Database["public"]["Enums"]["post_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "social_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_profiles: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          handle: string
+          id: string
+          name: string
+          platform: Database["public"]["Enums"]["platform_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          handle: string
+          id?: string
+          name: string
+          platform: Database["public"]["Enums"]["platform_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          handle?: string
+          id?: string
+          name?: string
+          platform?: Database["public"]["Enums"]["platform_type"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +203,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      content_type: "Post" | "Reel" | "Story" | "Video"
+      media_type: "banner" | "photo" | "video"
+      platform_type:
+        | "Instagram"
+        | "TikTok"
+        | "LinkedIn"
+        | "X"
+        | "Pinterest"
+        | "YouTube"
+      post_status: "Draft" | "Pending" | "Approved" | "Published" | "Canceled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +327,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      content_type: ["Post", "Reel", "Story", "Video"],
+      media_type: ["banner", "photo", "video"],
+      platform_type: [
+        "Instagram",
+        "TikTok",
+        "LinkedIn",
+        "X",
+        "Pinterest",
+        "YouTube",
+      ],
+      post_status: ["Draft", "Pending", "Approved", "Published", "Canceled"],
+    },
   },
 } as const

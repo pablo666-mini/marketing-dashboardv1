@@ -1,0 +1,174 @@
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import type { SocialPost, CreateSocialPost, UpdateSocialPost } from '@/types/supabase';
+
+const QUERY_KEY = ['social-posts'];
+
+export const useSocialPosts = () => {
+  return useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: async (): Promise<SocialPost[]> => {
+      console.log('Fetching social posts...');
+      const { data, error } = await supabase
+        .from('social_posts')
+        .select('*')
+        .order('post_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching social posts:', error);
+        throw new Error(error.message);
+      }
+
+      return data || [];
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+export const useSocialPostsByDateRange = (startDate: string, endDate: string, enabled = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEY, 'date-range', startDate, endDate],
+    queryFn: async (): Promise<SocialPost[]> => {
+      console.log(`Fetching social posts from ${startDate} to ${endDate}...`);
+      const { data, error } = await supabase
+        .from('social_posts')
+        .select('*')
+        .gte('post_date', startDate)
+        .lte('post_date', endDate)
+        .order('post_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching social posts by date range:', error);
+        throw new Error(error.message);
+      }
+
+      return data || [];
+    },
+    enabled,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useCreateSocialPost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (post: CreateSocialPost): Promise<SocialPost> => {
+      console.log('Creating social post:', post);
+      const { data, error } = await supabase
+        .from('social_posts')
+        .insert(post)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating social post:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+    onSuccess: (newPost) => {
+      queryClient.setQueryData(QUERY_KEY, (old: SocialPost[] | undefined) => {
+        if (!old) return [newPost];
+        return [...old, newPost].sort((a, b) => 
+          new Date(a.post_date).getTime() - new Date(b.post_date).getTime()
+        );
+      });
+
+      toast({
+        title: "Publicación creada",
+        description: "La publicación ha sido creada exitosamente.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Error al crear la publicación",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateSocialPost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: UpdateSocialPost }): Promise<SocialPost> => {
+      console.log('Updating social post:', id, updates);
+      const { data, error } = await supabase
+        .from('social_posts')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating social post:', error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+    onSuccess: (updatedPost) => {
+      queryClient.setQueryData(QUERY_KEY, (old: SocialPost[] | undefined) => {
+        if (!old) return [updatedPost];
+        return old.map(post => 
+          post.id === updatedPost.id ? updatedPost : post
+        );
+      });
+
+      toast({
+        title: "Publicación actualizada",
+        description: "La publicación ha sido actualizada exitosamente.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Error al actualizar la publicación",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeleteSocialPost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string): Promise<void> => {
+      console.log('Deleting social post:', id);
+      const { error } = await supabase
+        .from('social_posts')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting social post:', error);
+        throw new Error(error.message);
+      }
+    },
+    onSuccess: (_, deletedId) => {
+      queryClient.setQueryData(QUERY_KEY, (old: SocialPost[] | undefined) => {
+        if (!old) return [];
+        return old.filter(post => post.id !== deletedId);
+      });
+
+      toast({
+        title: "Publicación eliminada",
+        description: "La publicación ha sido eliminada exitosamente.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Error al eliminar la publicación",
+        variant: "destructive",
+      });
+    },
+  });
+};

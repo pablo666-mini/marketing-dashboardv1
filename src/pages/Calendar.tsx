@@ -1,6 +1,8 @@
 
 import { useState, useMemo } from 'react';
-import { usePosts, useActiveProfiles, useProducts } from '@/hooks/useApi';
+import { useSocialPosts } from '@/hooks/useSocialPosts';
+import { useActiveSocialProfiles } from '@/hooks/useSocialProfiles';
+import { useProducts } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { isSameDay } from 'date-fns';
 import { CalendarFilters as CalendarFiltersType, SocialPost } from '@/types';
@@ -9,24 +11,23 @@ import { CalendarGrid } from '@/components/CalendarGrid';
 import { SelectedDateDetails } from '@/components/SelectedDateDetails';
 
 const Calendar = () => {
-  const { data: posts, isLoading: postsLoading } = usePosts();
-  const { data: activeProfiles, isLoading: profilesLoading } = useActiveProfiles();
+  const { data: posts, isLoading: postsLoading } = useSocialPosts();
+  const { data: activeProfiles, isLoading: profilesLoading } = useActiveSocialProfiles();
   const { data: products, isLoading: productsLoading } = useProducts();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filters, setFilters] = useState<CalendarFiltersType>({});
 
-  // Move all useMemo hooks before any conditional returns
   // Filter posts based on current filters
   const filteredPosts = useMemo(() => {
     if (!posts) return [];
     return posts.filter(post => {
-      if (filters.profileId && post.profileId !== filters.profileId) return false;
+      if (filters.profileId && post.profile_id !== filters.profileId) return false;
       if (filters.status && post.status !== filters.status) return false;
-      if (filters.contentType && post.contentType !== filters.contentType) return false;
+      if (filters.contentType && post.content_type !== filters.contentType) return false;
       if (filters.platform) {
-        const profile = activeProfiles?.find(p => p.id === post.profileId);
+        const profile = activeProfiles?.find(p => p.id === post.profile_id);
         if (profile?.platform !== filters.platform) return false;
       }
       return true;
@@ -36,11 +37,11 @@ const Calendar = () => {
   // Get posts for selected date
   const selectedDatePosts = useMemo(() => {
     if (!selectedDate) return [];
-    return filteredPosts.filter(post => isSameDay(new Date(post.date), selectedDate));
+    return filteredPosts.filter(post => isSameDay(new Date(post.post_date), selectedDate));
   }, [selectedDate, filteredPosts]);
 
   const getPostsForDay = (day: Date) => {
-    return filteredPosts.filter(post => isSameDay(new Date(post.date), day));
+    return filteredPosts.filter(post => isSameDay(new Date(post.post_date), day));
   };
 
   const getProfileName = (profileId: string) => {
@@ -53,7 +54,6 @@ const Calendar = () => {
     return product ? product.name : 'Producto no encontrado';
   };
 
-  // Now check for loading states after all hooks are called
   if (postsLoading || profilesLoading || productsLoading) {
     return (
       <div className="space-y-6">

@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Filter } from 'lucide-react';
-import { CalendarFilters as CalendarFiltersType, PostStatus, ContentType, SocialProfile } from '@/types';
+import { CalendarFilters as CalendarFiltersType, SocialProfile } from '@/types';
 
 interface CalendarFiltersProps {
   filters: CalendarFiltersType;
@@ -51,7 +51,7 @@ export const CalendarFilters = ({ filters, setFilters, activeProfiles }: Calenda
             value={filters.status || 'all'} 
             onValueChange={(value) => setFilters(prev => ({ 
               ...prev, 
-              status: value === 'all' ? undefined : value as PostStatus 
+              status: value === 'all' ? undefined : value as any
             }))}
           >
             <SelectTrigger>
@@ -59,6 +59,7 @@ export const CalendarFilters = ({ filters, setFilters, activeProfiles }: Calenda
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los estados</SelectItem>
+              <SelectItem value="Draft">Borrador</SelectItem>
               <SelectItem value="Pending">Pendiente</SelectItem>
               <SelectItem value="Approved">Aprobada</SelectItem>
               <SelectItem value="Published">Publicada</SelectItem>
@@ -73,7 +74,7 @@ export const CalendarFilters = ({ filters, setFilters, activeProfiles }: Calenda
             value={filters.contentType || 'all'} 
             onValueChange={(value) => setFilters(prev => ({ 
               ...prev, 
-              contentType: value === 'all' ? undefined : value as ContentType 
+              contentType: value === 'all' ? undefined : value as any
             }))}
           >
             <SelectTrigger>

@@ -17,6 +17,7 @@ interface CalendarGridProps {
 }
 
 const statusColors = {
+  'Draft': 'bg-gray-500',
   'Pending': 'bg-yellow-500',
   'Approved': 'bg-blue-500',
   'Published': 'bg-green-500',
@@ -35,7 +36,7 @@ export const CalendarGrid = ({
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const monthPosts = filteredPosts.filter(post => {
-    const postDate = new Date(post.date);
+    const postDate = new Date(post.post_date);
     return postDate >= monthStart && postDate <= monthEnd;
   });
 
@@ -101,7 +102,7 @@ export const CalendarGrid = ({
                     <div
                       key={postIndex}
                       className={`w-full h-2 rounded-sm ${statusColors[post.status]}`}
-                      title={`${post.contentType} - ${getProfileName(post.profileId)}`}
+                      title={`${post.content_type} - ${getProfileName(post.profile_id || '')}`}
                     />
                   ))}
                   {dayPosts.length > 3 && (

@@ -1,69 +1,16 @@
 
-// TypeScript types for the social media management dashboard
+// Re-export Supabase types and add additional UI-specific types
+export * from './supabase';
 
-export type Platform = 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
-
-export type ContentType = 'Post' | 'Reel' | 'Story' | 'Video';
-
-export type ContentFormat = '9:16' | '4:5' | '1:1' | 'None';
-
-export type PostStatus = 'Pending' | 'Approved' | 'Published' | 'Canceled';
-
-export interface SocialProfile {
-  id: string;
-  name: string;
-  handle: string;
-  platform: Platform;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
+// UI-specific types that extend the database types
+export interface CalendarFilters {
+  profileId?: string;
+  status?: 'Draft' | 'Pending' | 'Approved' | 'Published' | 'Canceled';
+  contentType?: 'Post' | 'Reel' | 'Story' | 'Video';
+  platform?: 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
 }
 
-export interface MediaResource {
-  id: string;
-  name: string;
-  type: 'image' | 'video' | 'banner';
-  url: string;
-  format: ContentFormat;
-}
-
-export interface PlatformCopy {
-  platform: Platform;
-  content: string;
-  hashtags: string[];
-}
-
-export interface SocialPost {
-  id: string;
-  productId: string;
-  date: string; // ISO string
-  profileId: string;
-  contentType: ContentType;
-  contentFormat: ContentFormat;
-  mediaResources: MediaResource[];
-  copies: PlatformCopy[];
-  hashtags: string[];
-  status: PostStatus;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt?: string;
-}
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  landingUrl: string;
-  hashtags: string[];
-  briefing: string;
-  communicationKitUrl: string;
-  countries: string[];
-  salesObjectives: string[];
-  creativeConcept: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
+// Extended types for UI components
 export interface Protocol {
   id: string;
   title: string;
@@ -81,38 +28,21 @@ export interface MediaKitResource {
   description?: string;
 }
 
-export interface GeneralInfo {
-  protocols: Protocol[];
-  mediaKit: MediaKitResource[];
-  updatedAt: string;
-}
-
-// API Response types
-export interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
-}
-
-// Form types
-export interface CreatePostForm {
+// Form types for creating/updating
+export interface PostFormData {
   productId: string;
-  date: string;
+  postDate: string;
   profileId: string;
-  contentType: ContentType;
-  contentFormat: ContentFormat;
-  copies: PlatformCopy[];
+  contentType: 'Post' | 'Reel' | 'Story' | 'Video';
+  contentFormat: string;
+  copies: Record<string, string>;
   hashtags: string[];
+  status: 'Draft' | 'Pending' | 'Approved' | 'Published' | 'Canceled';
 }
 
-export interface UpdatePostForm extends Partial<CreatePostForm> {
-  status?: PostStatus;
-}
-
-// Filter types
-export interface CalendarFilters {
-  profileId?: string;
-  status?: PostStatus;
-  contentType?: ContentType;
-  platform?: Platform;
+export interface ProfileFormData {
+  name: string;
+  handle: string;
+  platform: 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
+  active: boolean;
 }

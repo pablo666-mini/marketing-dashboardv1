@@ -13,6 +13,7 @@ interface SelectedDateDetailsProps {
 }
 
 const statusColors = {
+  'Draft': 'bg-gray-500',
   'Pending': 'bg-yellow-500',
   'Approved': 'bg-blue-500',
   'Published': 'bg-green-500',
@@ -49,15 +50,15 @@ export const SelectedDateDetails = ({
                     {post.status}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
-                    {format(new Date(post.date), 'HH:mm')}
+                    {format(new Date(post.post_date), 'HH:mm')}
                   </span>
                 </div>
                 <div className="space-y-1">
-                  <p className="font-medium text-sm">{getProductName(post.productId)}</p>
-                  <p className="text-xs text-muted-foreground">{getProfileName(post.profileId)}</p>
+                  <p className="font-medium text-sm">{getProductName(post.product_id || '')}</p>
+                  <p className="text-xs text-muted-foreground">{getProfileName(post.profile_id || '')}</p>
                   <div className="flex gap-2">
-                    <Badge variant="outline" className="text-xs">{post.contentType}</Badge>
-                    <Badge variant="secondary" className="text-xs">{post.contentFormat}</Badge>
+                    <Badge variant="outline" className="text-xs">{post.content_type}</Badge>
+                    <Badge variant="secondary" className="text-xs">{post.content_format}</Badge>
                   </div>
                 </div>
               </div>

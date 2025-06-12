@@ -2,12 +2,52 @@
 // Re-export Supabase types and add additional UI-specific types
 export * from './supabase';
 
+// Add missing type exports
+export type Platform = 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
+export type ContentType = 'Post' | 'Reel' | 'Story' | 'Video';
+export type PostStatus = 'Draft' | 'Pending' | 'Approved' | 'Published' | 'Canceled';
+export type ContentFormat = '9:16' | '4:5' | '1:1' | 'None';
+
+// Legacy API types (for mock API compatibility)
+export interface ApiResponse<T> {
+  data: T;
+  success: boolean;
+  message: string;
+}
+
+export interface CreatePostForm {
+  productId: string;
+  date: string;
+  profileId: string;
+  contentType: ContentType;
+  contentFormat: ContentFormat;
+  hashtags: string[];
+  copies: PlatformCopy[];
+}
+
+export interface UpdatePostForm {
+  productId?: string;
+  date?: string;
+  profileId?: string;
+  contentType?: ContentType;
+  contentFormat?: ContentFormat;
+  hashtags?: string[];
+  copies?: PlatformCopy[];
+  status?: PostStatus;
+}
+
+export interface PlatformCopy {
+  platform: Platform;
+  content: string;
+  hashtags: string[];
+}
+
 // UI-specific types that extend the database types
 export interface CalendarFilters {
   profileId?: string;
-  status?: 'Draft' | 'Pending' | 'Approved' | 'Published' | 'Canceled';
-  contentType?: 'Post' | 'Reel' | 'Story' | 'Video';
-  platform?: 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
+  status?: PostStatus;
+  contentType?: ContentType;
+  platform?: Platform;
 }
 
 // Extended types for UI components
@@ -33,16 +73,16 @@ export interface PostFormData {
   productId: string;
   postDate: string;
   profileId: string;
-  contentType: 'Post' | 'Reel' | 'Story' | 'Video';
+  contentType: ContentType;
   contentFormat: string;
   copies: Record<string, string>;
   hashtags: string[];
-  status: 'Draft' | 'Pending' | 'Approved' | 'Published' | 'Canceled';
+  status: PostStatus;
 }
 
 export interface ProfileFormData {
   name: string;
   handle: string;
-  platform: 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
+  platform: Platform;
   active: boolean;
 }

@@ -50,7 +50,7 @@ export const updateProfile = async (
   profiles[profileIndex] = {
     ...profiles[profileIndex],
     ...updates,
-    updatedAt: new Date().toISOString()
+    updated_at: new Date().toISOString()
   };
 
   return {
@@ -77,11 +77,17 @@ export const createPost = async (postData: CreatePostForm): Promise<ApiResponse<
 
   const newPost: SocialPost = {
     id: Date.now().toString(),
-    ...postData,
-    mediaResources: [], // Will be added separately
+    product_id: postData.productId,
+    post_date: postData.date,
+    profile_id: postData.profileId,
+    content_type: postData.contentType,
+    content_format: postData.contentFormat,
+    copies: postData.copies,
+    hashtags: postData.hashtags,
+    media_resources_ids: [],
     status: 'Pending',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   };
 
   posts.push(newPost);
@@ -111,9 +117,15 @@ export const updatePost = async (
 
   posts[postIndex] = {
     ...posts[postIndex],
-    ...updates,
-    updatedAt: new Date().toISOString(),
-    ...(updates.status === 'Published' && { publishedAt: new Date().toISOString() })
+    ...(updates.productId && { product_id: updates.productId }),
+    ...(updates.date && { post_date: updates.date }),
+    ...(updates.profileId && { profile_id: updates.profileId }),
+    ...(updates.contentType && { content_type: updates.contentType }),
+    ...(updates.contentFormat && { content_format: updates.contentFormat }),
+    ...(updates.copies && { copies: updates.copies }),
+    ...(updates.hashtags && { hashtags: updates.hashtags }),
+    ...(updates.status && { status: updates.status }),
+    updated_at: new Date().toISOString()
   };
 
   return {
@@ -187,7 +199,7 @@ export const getPostsByDateRange = async (
   await delay(400);
   
   const filteredPosts = posts.filter(post => {
-    const postDate = new Date(post.date);
+    const postDate = new Date(post.post_date);
     const start = new Date(startDate);
     const end = new Date(endDate);
     return postDate >= start && postDate <= end;

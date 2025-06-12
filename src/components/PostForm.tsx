@@ -46,11 +46,11 @@ export const PostForm = ({
   isLoading 
 }: PostFormProps) => {
   const [formData, setFormData] = useState({
-    productId: initialData?.productId || '',
-    date: initialData ? new Date(initialData.date) : new Date(),
-    profileId: initialData?.profileId || '',
-    contentType: initialData?.contentType || 'Post' as ContentType,
-    contentFormat: initialData?.contentFormat || '1:1' as ContentFormat,
+    productId: initialData?.product_id || '',
+    date: initialData ? new Date(initialData.post_date) : new Date(),
+    profileId: initialData?.profile_id || '',
+    contentType: initialData?.content_type || 'Post' as ContentType,
+    contentFormat: initialData?.content_format || '1:1' as ContentFormat,
     hashtags: initialData?.hashtags || [],
     copies: initialData?.copies || []
   });

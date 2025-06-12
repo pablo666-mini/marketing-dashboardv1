@@ -39,14 +39,16 @@ const statusColors = {
   'Pending': 'bg-yellow-100 text-yellow-800',
   'Approved': 'bg-blue-100 text-blue-800',
   'Published': 'bg-green-100 text-green-800',
-  'Canceled': 'bg-red-100 text-red-800'
+  'Canceled': 'bg-red-100 text-red-800',
+  'Draft': 'bg-gray-100 text-gray-800'
 };
 
 const statusLabels = {
   'Pending': 'Pendiente',
   'Approved': 'Aprobada',
   'Published': 'Publicada',
-  'Canceled': 'Cancelada'
+  'Canceled': 'Cancelada',
+  'Draft': 'Borrador'
 };
 
 export const PostTable = ({
@@ -83,6 +85,7 @@ export const PostTable = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los estados</SelectItem>
+              <SelectItem value="Draft">Borradores</SelectItem>
               <SelectItem value="Pending">Pendientes</SelectItem>
               <SelectItem value="Approved">Aprobadas</SelectItem>
               <SelectItem value="Published">Publicadas</SelectItem>
@@ -136,45 +139,46 @@ export const PostTable = ({
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <div className="font-medium">
-                          {format(new Date(post.date), 'dd/MM/yyyy', { locale: es })}
+                          {format(new Date(post.post_date), 'dd/MM/yyyy', { locale: es })}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {format(new Date(post.date), 'HH:mm')}
+                          {format(new Date(post.post_date), 'HH:mm')}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   
                   <TableCell>
-                    <div className="font-medium">{getProductName(post.productId)}</div>
+                    <div className="font-medium">{getProductName(post.product_id || '')}</div>
                   </TableCell>
                   
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{getProfileName(post.profileId)}</span>
+                      <span className="text-sm">{getProfileName(post.profile_id || '')}</span>
                     </div>
                   </TableCell>
                   
                   <TableCell>
-                    <Badge variant="outline">{post.contentType}</Badge>
+                    <Badge variant="outline">{post.content_type}</Badge>
                   </TableCell>
                   
                   <TableCell>
-                    <Badge variant="secondary">{post.contentFormat}</Badge>
+                    <Badge variant="secondary">{post.content_format}</Badge>
                   </TableCell>
                   
                   <TableCell>
                     <Select 
-                      value={post.status} 
+                      value={post.status || 'Draft'} 
                       onValueChange={(value: PostStatus) => onStatusChange(post.id, value)}
                     >
                       <SelectTrigger className="w-32">
-                        <Badge className={statusColors[post.status]}>
-                          {statusLabels[post.status]}
+                        <Badge className={statusColors[post.status || 'Draft']}>
+                          {statusLabels[post.status || 'Draft']}
                         </Badge>
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="Draft">Borrador</SelectItem>
                         <SelectItem value="Pending">Pendiente</SelectItem>
                         <SelectItem value="Approved">Aprobada</SelectItem>
                         <SelectItem value="Published">Publicada</SelectItem>

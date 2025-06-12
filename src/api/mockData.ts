@@ -19,8 +19,8 @@ export const mockProfiles: SocialProfile[] = [
     handle: '@miniland_es',
     platform: 'Instagram',
     active: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
@@ -28,8 +28,8 @@ export const mockProfiles: SocialProfile[] = [
     handle: '@minilandofficial',
     platform: 'TikTok',
     active: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '3',
@@ -37,8 +37,8 @@ export const mockProfiles: SocialProfile[] = [
     handle: '@miniland',
     platform: 'LinkedIn',
     active: false,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '4',
@@ -46,8 +46,8 @@ export const mockProfiles: SocialProfile[] = [
     handle: '@miniland_oficial',
     platform: 'X',
     active: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '5',
@@ -55,8 +55,8 @@ export const mockProfiles: SocialProfile[] = [
     handle: '@minilandtoys',
     platform: 'Pinterest',
     active: false,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '6',
@@ -64,8 +64,8 @@ export const mockProfiles: SocialProfile[] = [
     handle: '@MinilandChannel',
     platform: 'YouTube',
     active: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   }
 ];
 
@@ -75,29 +75,29 @@ export const mockProducts: Product[] = [
     id: '1',
     name: 'Dolls Collection 2024',
     description: 'Nueva colección de muñecas inclusivas y diversas',
-    landingUrl: 'https://miniland.com/dolls-2024',
+    landing_url: 'https://miniland.com/dolls-2024',
     hashtags: ['#miniland', '#dolls2024', '#diversidad', '#inclusion'],
     briefing: 'Lanzamiento de la nueva colección de muñecas que celebra la diversidad y la inclusión',
-    communicationKitUrl: 'https://drive.google.com/folder/dolls2024',
+    communication_kit_url: 'https://drive.google.com/folder/dolls2024',
     countries: ['España', 'Francia', 'Italia', 'Portugal'],
-    salesObjectives: ['Incrementar ventas 25%', 'Expandir mercado europeo', 'Posicionamiento premium'],
-    creativeConcept: 'Celebrando la diversidad a través del juego',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    sales_objectives: ['Incrementar ventas 25%', 'Expandir mercado europeo', 'Posicionamiento premium'],
+    creative_concept: 'Celebrando la diversidad a través del juego',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
     name: 'Smart Toys Line',
     description: 'Línea de juguetes educativos inteligentes',
-    landingUrl: 'https://miniland.com/smart-toys',
+    landing_url: 'https://miniland.com/smart-toys',
     hashtags: ['#smarttoys', '#educacion', '#tecnologia', '#miniland'],
     briefing: 'Productos educativos que combinan tecnología y aprendizaje',
-    communicationKitUrl: 'https://drive.google.com/folder/smarttoys',
+    communication_kit_url: 'https://drive.google.com/folder/smarttoys',
     countries: ['España', 'Reino Unido', 'Alemania'],
-    salesObjectives: ['Penetrar mercado tech-edu', 'Diferenciación premium'],
-    creativeConcept: 'El futuro del aprendizaje está aquí',
-    createdAt: '2024-01-15T00:00:00Z',
-    updatedAt: '2024-01-15T00:00:00Z'
+    sales_objectives: ['Penetrar mercado tech-edu', 'Diferenciación premium'],
+    creative_concept: 'El futuro del aprendizaje está aquí',
+    created_at: '2024-01-15T00:00:00Z',
+    updated_at: '2024-01-15T00:00:00Z'
   }
 ];
 
@@ -105,20 +105,12 @@ export const mockProducts: Product[] = [
 export const mockPosts: SocialPost[] = [
   {
     id: '1',
-    productId: '1',
-    date: '2024-06-15T10:00:00Z',
-    profileId: '1',
-    contentType: 'Post',
-    contentFormat: '1:1',
-    mediaResources: [
-      {
-        id: '1',
-        name: 'dolls_hero_1x1.jpg',
-        type: 'image',
-        url: '/api/media/dolls_hero_1x1.jpg',
-        format: '1:1'
-      }
-    ],
+    product_id: '1',
+    post_date: '2024-06-15T10:00:00Z',
+    profile_id: '1',
+    content_type: 'Post',
+    content_format: '1:1',
+    media_resources_ids: ['1'],
     copies: [
       {
         platform: 'Instagram',
@@ -128,25 +120,17 @@ export const mockPosts: SocialPost[] = [
     ],
     hashtags: ['#miniland', '#dolls2024', '#diversidad', '#inclusion'],
     status: 'Approved',
-    createdAt: '2024-06-01T00:00:00Z',
-    updatedAt: '2024-06-05T00:00:00Z'
+    created_at: '2024-06-01T00:00:00Z',
+    updated_at: '2024-06-05T00:00:00Z'
   },
   {
     id: '2',
-    productId: '1',
-    date: '2024-06-16T14:30:00Z',
-    profileId: '2',
-    contentType: 'Reel',
-    contentFormat: '9:16',
-    mediaResources: [
-      {
-        id: '2',
-        name: 'dolls_reel_9x16.mp4',
-        type: 'video',
-        url: '/api/media/dolls_reel_9x16.mp4',
-        format: '9:16'
-      }
-    ],
+    product_id: '1',
+    post_date: '2024-06-16T14:30:00Z',
+    profile_id: '2',
+    content_type: 'Reel',
+    content_format: '9:16',
+    media_resources_ids: ['2'],
     copies: [
       {
         platform: 'TikTok',
@@ -156,25 +140,17 @@ export const mockPosts: SocialPost[] = [
     ],
     hashtags: ['#miniland', '#dolls2024', '#representacion', '#diversidad', '#fyp'],
     status: 'Pending',
-    createdAt: '2024-06-02T00:00:00Z',
-    updatedAt: '2024-06-02T00:00:00Z'
+    created_at: '2024-06-02T00:00:00Z',
+    updated_at: '2024-06-02T00:00:00Z'
   },
   {
     id: '3',
-    productId: '2',
-    date: '2024-06-20T09:00:00Z',
-    profileId: '3',
-    contentType: 'Post',
-    contentFormat: '4:5',
-    mediaResources: [
-      {
-        id: '3',
-        name: 'smart_toys_linkedin_4x5.jpg',
-        type: 'image',
-        url: '/api/media/smart_toys_linkedin_4x5.jpg',
-        format: '4:5'
-      }
-    ],
+    product_id: '2',
+    post_date: '2024-06-20T09:00:00Z',
+    profile_id: '3',
+    content_type: 'Post',
+    content_format: '4:5',
+    media_resources_ids: ['3'],
     copies: [
       {
         platform: 'LinkedIn',
@@ -184,14 +160,14 @@ export const mockPosts: SocialPost[] = [
     ],
     hashtags: ['#educacion', '#tecnologia', '#innovacion', '#miniland'],
     status: 'Published',
-    createdAt: '2024-06-03T00:00:00Z',
-    updatedAt: '2024-06-10T00:00:00Z',
-    publishedAt: '2024-06-10T09:00:00Z'
+    created_at: '2024-06-03T00:00:00Z',
+    updated_at: '2024-06-10T00:00:00Z'
   }
 ];
 
 // Mock General Info
 export const mockGeneralInfo: GeneralInfo = {
+  id: '1',
   protocols: [
     {
       id: '1',
@@ -215,7 +191,7 @@ export const mockGeneralInfo: GeneralInfo = {
       content: 'Instagram: Máximo 30, usar 5-10 principales\nTikTok: 3-5 hashtags trending + branded\nLinkedIn: 3-5 hashtags profesionales\nX: 1-2 hashtags máximo'
     }
   ],
-  mediaKit: [
+  media_kit: [
     {
       id: '1',
       name: 'Convocatoria de Prensa Dolls 2024',
@@ -252,5 +228,5 @@ export const mockGeneralInfo: GeneralInfo = {
       description: 'Contenido audiovisual para campañas'
     }
   ],
-  updatedAt: '2024-06-01T00:00:00Z'
+  updated_at: '2024-06-01T00:00:00Z'
 };

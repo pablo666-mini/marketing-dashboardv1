@@ -2,19 +2,33 @@
 // Re-export Supabase types and add additional UI-specific types
 export * from './supabase';
 
-// Add missing type exports
+// Platform enum - supported social media platforms
 export type Platform = 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
+
+// Content type enum - types of social media content
 export type ContentType = 'Post' | 'Reel' | 'Story' | 'Video';
+
+// Post status enum - workflow states for social media posts
 export type PostStatus = 'Draft' | 'Pending' | 'Approved' | 'Published' | 'Canceled';
+
+// Content format enum - aspect ratios and formats
 export type ContentFormat = '9:16' | '4:5' | '1:1' | 'None';
 
-// Legacy API types (for mock API compatibility)
+// Legacy API response wrapper for mock API compatibility
 export interface ApiResponse<T> {
   data: T;
   success: boolean;
   message: string;
 }
 
+// Platform-specific copy content
+export interface PlatformCopy {
+  platform: Platform;
+  content: string;
+  hashtags: string[];
+}
+
+// Form data for creating new posts
 export interface CreatePostForm {
   productId: string;
   date: string;
@@ -25,6 +39,7 @@ export interface CreatePostForm {
   copies: PlatformCopy[];
 }
 
+// Form data for updating existing posts
 export interface UpdatePostForm {
   productId?: string;
   date?: string;
@@ -36,13 +51,7 @@ export interface UpdatePostForm {
   status?: PostStatus;
 }
 
-export interface PlatformCopy {
-  platform: Platform;
-  content: string;
-  hashtags: string[];
-}
-
-// UI-specific types that extend the database types
+// UI-specific calendar filters
 export interface CalendarFilters {
   profileId?: string;
   status?: PostStatus;
@@ -50,7 +59,7 @@ export interface CalendarFilters {
   platform?: Platform;
 }
 
-// Extended types for UI components
+// Protocol information for communication guidelines
 export interface Protocol {
   id: string;
   title: string;
@@ -59,6 +68,7 @@ export interface Protocol {
   content: string;
 }
 
+// Media kit resource information
 export interface MediaKitResource {
   id: string;
   name: string;
@@ -68,7 +78,7 @@ export interface MediaKitResource {
   description?: string;
 }
 
-// Form types for creating/updating
+// Form data for creating/updating posts (UI layer)
 export interface PostFormData {
   productId: string;
   postDate: string;
@@ -80,6 +90,7 @@ export interface PostFormData {
   status: PostStatus;
 }
 
+// Form data for creating/updating profiles (UI layer)
 export interface ProfileFormData {
   name: string;
   handle: string;

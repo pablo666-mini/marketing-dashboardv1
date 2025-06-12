@@ -1,4 +1,3 @@
-
 // Posts management page - create, edit, and manage social media posts
 import { useState } from 'react';
 import { usePosts, useActiveProfiles, useProducts, useCreatePost, useUpdatePost, useDeletePost } from '@/hooks/useApi';
@@ -83,7 +82,7 @@ const Posts = () => {
   // Filter posts
   const filteredPosts = posts?.filter(post => {
     if (statusFilter !== 'all' && post.status !== statusFilter) return false;
-    if (typeFilter !== 'all' && post.contentType !== typeFilter) return false;
+    if (typeFilter !== 'all' && post.content_type !== typeFilter) return false;
     return true;
   }) || [];
 

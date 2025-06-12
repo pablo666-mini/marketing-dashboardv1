@@ -82,7 +82,7 @@ const GeneralInfo = () => {
                   <p className="text-muted-foreground">{product.description}</p>
                 </div>
                 <Button variant="outline" size="sm" asChild>
-                  <a href={product.landingUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={product.landing_url} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Ver Producto
                   </a>
@@ -92,13 +92,13 @@ const GeneralInfo = () => {
               <div className="space-y-2">
                 <div>
                   <h4 className="font-medium">Concepto Creativo:</h4>
-                  <p className="text-sm text-muted-foreground">{product.creativeConcept}</p>
+                  <p className="text-sm text-muted-foreground">{product.creative_concept}</p>
                 </div>
                 
                 <div>
                   <h4 className="font-medium">Países:</h4>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {product.countries.map((country) => (
+                    {product.countries?.map((country) => (
                       <Badge key={country} variant="secondary">{country}</Badge>
                     ))}
                   </div>
@@ -107,7 +107,7 @@ const GeneralInfo = () => {
                 <div>
                   <h4 className="font-medium">Hashtags:</h4>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {product.hashtags.map((hashtag) => (
+                    {product.hashtags?.map((hashtag) => (
                       <Badge key={hashtag} variant="outline">{hashtag}</Badge>
                     ))}
                   </div>
@@ -115,7 +115,7 @@ const GeneralInfo = () => {
               </div>
 
               <Button variant="ghost" size="sm" asChild>
-                <a href={product.communicationKitUrl} target="_blank" rel="noopener noreferrer">
+                <a href={product.communication_kit_url} target="_blank" rel="noopener noreferrer">
                   <FileText className="h-4 w-4 mr-2" />
                   Kit de Comunicación
                 </a>
@@ -135,7 +135,7 @@ const GeneralInfo = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {generalInfo?.protocols.map((protocol) => (
+            {generalInfo?.protocols?.map((protocol: any) => (
               <div key={protocol.id} className="space-y-2">
                 <h4 className="font-medium">{protocol.title}</h4>
                 <p className="text-sm text-muted-foreground">{protocol.description}</p>
@@ -159,7 +159,7 @@ const GeneralInfo = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {generalInfo?.mediaKit.map((resource) => (
+            {generalInfo?.media_kit?.map((resource: any) => (
               <div key={resource.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                 <div className="flex items-center gap-3">
                   {getMediaIcon(resource.category)}

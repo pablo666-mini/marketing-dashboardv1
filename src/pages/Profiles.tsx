@@ -129,7 +129,7 @@ const Profiles = () => {
               
               <div className="mt-3 pt-3 border-t border-border">
                 <div className="text-xs text-muted-foreground">
-                  <p>Actualizado: {new Date(profile.updatedAt).toLocaleDateString('es-ES')}</p>
+                  <p>Actualizado: {new Date(profile.updated_at).toLocaleDateString('es-ES')}</p>
                 </div>
               </div>
             </CardContent>

@@ -106,56 +106,59 @@ const Profiles = () => {
       </Card>
 
       {/* Profiles by Platform */}
-      {Object.entries(profilesByPlatform).map(([platform, platformProfiles]) => (
-        <Card key={platform}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-lg ${getPlatformColor(platform as Platform)} flex items-center justify-center text-white`}>
-                {getPlatformIcon(platform as Platform)}
-              </div>
-              {platform}
-              <Badge variant="outline" className="ml-auto">
-                {platformProfiles.filter(p => p.active).length} de {platformProfiles.length} activos
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {platformProfiles.map((profile) => (
-                <div key={profile.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div>
-                        <h4 className="font-medium">{profile.name}</h4>
-                        <p className="text-sm text-muted-foreground">@{profile.handle}</p>
+      {Object.entries(profilesByPlatform).map(([platform, platformProfiles]) => {
+        const typedPlatformProfiles = platformProfiles as SocialProfile[];
+        return (
+          <Card key={platform}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg ${getPlatformColor(platform as Platform)} flex items-center justify-center text-white`}>
+                  {getPlatformIcon(platform as Platform)}
+                </div>
+                {platform}
+                <Badge variant="outline" className="ml-auto">
+                  {typedPlatformProfiles.filter(p => p.active).length} de {typedPlatformProfiles.length} activos
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {typedPlatformProfiles.map((profile) => (
+                  <div key={profile.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div>
+                          <h4 className="font-medium">{profile.name}</h4>
+                          <p className="text-sm text-muted-foreground">@{profile.handle}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={profile.active ? "default" : "secondary"}
+                          className={profile.active ? "bg-green-500 hover:bg-green-600" : ""}
+                        >
+                          {profile.active ? 'Activo' : 'Inactivo'}
+                        </Badge>
+                        {!profile.active && (
+                          <span className="text-xs text-orange-600">
+                            {profile.handle.includes('international') || profile.handle.includes('aus') ? 
+                              'En desuso' : 'Requiere reactivación'}
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge 
-                        variant={profile.active ? "default" : "secondary"}
-                        className={profile.active ? "bg-green-500 hover:bg-green-600" : ""}
-                      >
-                        {profile.active ? 'Activo' : 'Inactivo'}
-                      </Badge>
-                      {!profile.active && (
-                        <span className="text-xs text-orange-600">
-                          {profile.handle.includes('international') || profile.handle.includes('aus') ? 
-                            'En desuso' : 'Requiere reactivación'}
-                        </span>
-                      )}
-                    </div>
+                    <Switch
+                      checked={profile.active}
+                      onCheckedChange={(checked) => handleToggleProfile(profile.id, checked)}
+                      disabled={updateProfile.isPending}
+                    />
                   </div>
-                  <Switch
-                    checked={profile.active}
-                    onCheckedChange={(checked) => handleToggleProfile(profile.id, checked)}
-                    disabled={updateProfile.isPending}
-                  />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
 
       {/* Active Profiles Summary for Content Creation */}
       {activeCount > 0 && (

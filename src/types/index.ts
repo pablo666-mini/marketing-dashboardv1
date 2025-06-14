@@ -1,8 +1,19 @@
+
 // Re-export Supabase types and add additional UI-specific types
 export * from './supabase';
 
-// Platform enum - supported social media platforms
-export type Platform = 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube';
+// Platform enum - supported social media platforms (extensible)
+export type Platform = 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube' | string;
+
+// Predefined platforms for UI consistency
+export const PREDEFINED_PLATFORMS: readonly Platform[] = [
+  'Instagram', 
+  'TikTok', 
+  'LinkedIn', 
+  'X', 
+  'Pinterest', 
+  'YouTube'
+] as const;
 
 // Content type enum - types of social media content
 export type ContentType = 'Post' | 'Reel' | 'Story' | 'Video';

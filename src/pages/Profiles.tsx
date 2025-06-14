@@ -1,11 +1,10 @@
-
 // Social Profiles management page
 import { useSocialProfiles, useUpdateSocialProfile } from '@/hooks/useSocialProfiles';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Platform, SocialProfile } from '@/types';
+import { Platform, SocialProfile, PREDEFINED_PLATFORMS } from '@/types';
 import { Instagram, Linkedin, Youtube } from 'lucide-react';
 import { CreateProfileDialog } from '@/components/CreateProfileDialog';
 
@@ -26,7 +25,7 @@ const Profiles = () => {
       case 'X': return 'bg-black';
       case 'Pinterest': return 'bg-red-600';
       case 'YouTube': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      default: return 'bg-gray-500'; // Para plataformas personalizadas
     }
   };
 
@@ -38,7 +37,10 @@ const Profiles = () => {
       case 'X': return <span className="text-xs font-bold">X</span>;
       case 'Pinterest': return <span className="text-xs font-bold">PT</span>;
       case 'YouTube': return <Youtube className="h-4 w-4" />;
-      default: return <span className="text-xs font-bold">??</span>;
+      default: 
+        // Para plataformas personalizadas, usar las primeras 2 letras
+        const initials = platform.slice(0, 2).toUpperCase();
+        return <span className="text-xs font-bold">{initials}</span>;
     }
   };
 

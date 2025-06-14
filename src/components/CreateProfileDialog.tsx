@@ -7,13 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus } from 'lucide-react';
-import { Platform } from '@/types';
+import { Platform, PREDEFINED_PLATFORMS } from '@/types';
 import { useCreateSocialProfile } from '@/hooks/useSocialProfiles';
-
-const platforms: Platform[] = ['Instagram', 'TikTok', 'LinkedIn', 'X', 'Pinterest', 'YouTube'];
 
 export const CreateProfileDialog = () => {
   const [open, setOpen] = useState(false);
+  const [showCustomPlatform, setShowCustomPlatform] = useState(false);
+  const [customPlatform, setCustomPlatform] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     handle: '',
@@ -23,17 +23,35 @@ export const CreateProfileDialog = () => {
 
   const createProfile = useCreateSocialProfile();
 
+  const handlePlatformChange = (value: string) => {
+    if (value === 'custom') {
+      setShowCustomPlatform(true);
+      setFormData(prev => ({ ...prev, platform: '' }));
+    } else {
+      setShowCustomPlatform(false);
+      setCustomPlatform('');
+      setFormData(prev => ({ ...prev, platform: value as Platform }));
+    }
+  };
+
+  const handleCustomPlatformChange = (value: string) => {
+    setCustomPlatform(value);
+    setFormData(prev => ({ ...prev, platform: value as Platform }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.handle || !formData.platform) {
+    const finalPlatform = showCustomPlatform ? customPlatform : formData.platform;
+    
+    if (!formData.name || !formData.handle || !finalPlatform) {
       return;
     }
 
     createProfile.mutate({
       name: formData.name,
       handle: formData.handle,
-      platform: formData.platform,
+      platform: finalPlatform as Platform,
       active: formData.active
     }, {
       onSuccess: () => {
@@ -44,9 +62,14 @@ export const CreateProfileDialog = () => {
           platform: '' as Platform,
           active: true
         });
+        setShowCustomPlatform(false);
+        setCustomPlatform('');
       }
     });
   };
+
+  const isFormValid = formData.name && formData.handle && 
+    (showCustomPlatform ? customPlatform : formData.platform);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -64,20 +87,34 @@ export const CreateProfileDialog = () => {
           <div>
             <Label htmlFor="platform">Plataforma</Label>
             <Select 
-              value={formData.platform} 
-              onValueChange={(value: Platform) => setFormData(prev => ({ ...prev, platform: value }))}
+              value={showCustomPlatform ? 'custom' : formData.platform} 
+              onValueChange={handlePlatformChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona una plataforma" />
               </SelectTrigger>
               <SelectContent>
-                {platforms.map((platform) => (
+                {PREDEFINED_PLATFORMS.map((platform) => (
                   <SelectItem key={platform} value={platform}>
                     {platform}
                   </SelectItem>
                 ))}
+                <SelectItem value="custom">
+                  + Otra plataforma
+                </SelectItem>
               </SelectContent>
             </Select>
+            
+            {showCustomPlatform && (
+              <div className="mt-2">
+                <Input
+                  placeholder="Nombre de la plataforma"
+                  value={customPlatform}
+                  onChange={(e) => handleCustomPlatformChange(e.target.value)}
+                  required
+                />
+              </div>
+            )}
           </div>
 
           <div>
@@ -123,7 +160,7 @@ export const CreateProfileDialog = () => {
             </Button>
             <Button 
               type="submit" 
-              disabled={createProfile.isPending || !formData.name || !formData.handle || !formData.platform}
+              disabled={createProfile.isPending || !isFormValid}
             >
               {createProfile.isPending ? 'Creando...' : 'Crear Perfil'}
             </Button>

@@ -38,18 +38,18 @@ export const CreateProfileDialog = () => {
     e.preventDefault();
     
     // Determine the final platform value for the database
-    const finalPlatform = formData.platform === 'Other' 
+    const platformValue = formData.platform === 'Other' 
       ? formData.customPlatformName || 'Other'
       : formData.platform;
     
-    if (!formData.name || !formData.handle || !finalPlatform) {
+    if (!formData.name || !formData.handle || !platformValue) {
       return;
     }
 
     createProfile.mutate({
       name: formData.name,
       handle: formData.handle,
-      platform: finalPlatform,
+      platform: platformValue,
       active: formData.active
     }, {
       onSuccess: () => {

@@ -1,4 +1,6 @@
+
 import { useState, useMemo } from 'react';
+import { format } from 'date-fns';
 import { useSocialPostsByDateRange } from '@/hooks/useSocialPosts';
 import { useActiveSocialProfiles } from '@/hooks/useSocialProfiles';
 import { useProducts } from '@/hooks/useProducts';
@@ -9,7 +11,20 @@ import { CalendarFilters } from '@/components/CalendarFilters';
 import { CalendarGrid } from '@/components/CalendarGrid';
 import { SelectedDateDetails } from '@/components/SelectedDateDetails';
 
+// Helper function to format date for API
+const formatDateForAPI = (date: Date) => {
+  return format(date, 'yyyy-MM-dd');
+};
+
 const Calendar = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [filters, setFilters] = useState<CalendarFiltersType>({});
+
+  // Calculate date range for the current month
+  const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
   const { data: posts = [], isLoading: postsLoading } = useSocialPostsByDateRange(
     formatDateForAPI(startDate),
     formatDateForAPI(endDate),
@@ -17,10 +32,6 @@ const Calendar = () => {
   );
   const { data: activeProfiles, isLoading: profilesLoading } = useActiveSocialProfiles();
   const { data: products, isLoading: productsLoading } = useProducts();
-
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [filters, setFilters] = useState<CalendarFiltersType>({});
 
   // Filter posts based on current filters
   const filteredPosts = useMemo(() => {

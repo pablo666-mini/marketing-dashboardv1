@@ -1,17 +1,14 @@
 
-// Form component for creating and editing social media posts
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Plus, X } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -24,6 +21,8 @@ import {
   PlatformCopy,
   Platform 
 } from '@/types';
+import { MultiPlatformSelector } from '@/components/MultiPlatformSelector';
+import { PlatformCopiesEditor } from '@/components/PlatformCopiesEditor';
 
 interface PostFormProps {
   activeProfiles: SocialProfile[];
@@ -54,81 +53,44 @@ export const PostForm = ({
     contentType: initialData?.content_type || 'Post' as ContentType,
     contentFormat: initialData?.content_format || '1:1' as ContentFormat,
     hashtags: initialData?.hashtags || [],
-    copies: initialData?.copies || [] as PlatformCopy[],
     launchId: initialData?.launch_id || defaultLaunchId || ''
   });
 
-  const [newHashtag, setNewHashtag] = useState('');
-  const [selectedProfile, setSelectedProfile] = useState<SocialProfile | null>(null);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
+  const [copies, setCopies] = useState<PlatformCopy[]>([]);
 
+  // Initialize platform selection and copies from initial data
   useEffect(() => {
-    if (formData.profileId) {
+    if (initialData?.copies && Array.isArray(initialData.copies)) {
+      const platforms = initialData.copies.map(copy => copy.platform);
+      setSelectedPlatforms(platforms);
+      setCopies(initialData.copies);
+    } else if (formData.profileId) {
+      // If no initial data but profile selected, use profile's platform
       const profile = activeProfiles.find(p => p.id === formData.profileId);
-      setSelectedProfile(profile || null);
+      if (profile) {
+        setSelectedPlatforms([profile.platform]);
+        setCopies([{ platform: profile.platform, content: '', hashtags: [] }]);
+      }
     }
-  }, [formData.profileId, activeProfiles]);
+  }, [initialData, formData.profileId, activeProfiles]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const submitData = {
-      ...formData,
-      date: formData.date.toISOString(),
-      copies: Array.isArray(formData.copies) && formData.copies.length > 0 ? formData.copies : [
-        {
-          platform: selectedProfile?.platform || 'Instagram',
-          content: '',
-          hashtags: formData.hashtags
-        }
-      ]
+      product_id: formData.productId,
+      post_date: formData.date.toISOString(),
+      profile_id: formData.profileId,
+      content_type: formData.contentType,
+      content_format: formData.contentFormat,
+      hashtags: formData.hashtags,
+      copies: copies.length > 0 ? copies : [],
+      launch_id: formData.launchId || null
     };
 
     console.log('Submitting post data:', submitData);
     onSubmit(submitData);
-  };
-
-  const addHashtag = () => {
-    if (newHashtag.trim() && !formData.hashtags.includes(newHashtag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        hashtags: [...prev.hashtags, newHashtag.trim()]
-      }));
-      setNewHashtag('');
-    }
-  };
-
-  const removeHashtag = (hashtag: string) => {
-    setFormData(prev => ({
-      ...prev,
-      hashtags: prev.hashtags.filter(h => h !== hashtag)
-    }));
-  };
-
-  const updateCopy = (platform: Platform, content: string) => {
-    setFormData(prev => {
-      const copies = Array.isArray(prev.copies) ? prev.copies : [];
-      const existingCopyIndex = copies.findIndex(c => c.platform === platform);
-      
-      if (existingCopyIndex >= 0) {
-        const updatedCopies = [...copies];
-        updatedCopies[existingCopyIndex] = {
-          ...updatedCopies[existingCopyIndex],
-          content,
-          hashtags: prev.hashtags
-        };
-        return { ...prev, copies: updatedCopies };
-      } else {
-        return {
-          ...prev,
-          copies: [...copies, { platform, content, hashtags: prev.hashtags }]
-        };
-      }
-    });
-  };
-
-  const getCopyForPlatform = (platform: Platform) => {
-    if (!Array.isArray(formData.copies)) return '';
-    return formData.copies.find(c => c.platform === platform)?.content || '';
   };
 
   return (
@@ -240,55 +202,22 @@ export const PostForm = ({
           </div>
         </div>
 
-        {/* Hashtags */}
+        {/* Platform Selection */}
         <div className="space-y-4">
-          <div>
-            <Label>Hashtags</Label>
-            <div className="flex gap-2">
-              <Input
-                value={newHashtag}
-                onChange={(e) => setNewHashtag(e.target.value)}
-                placeholder="#hashtag"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHashtag())}
-              />
-              <Button type="button" onClick={addHashtag} size="sm">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.hashtags.map((hashtag) => (
-                <Badge key={hashtag} variant="secondary" className="gap-1">
-                  {hashtag}
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
-                    onClick={() => removeHashtag(hashtag)}
-                  />
-                </Badge>
-              ))}
-            </div>
-          </div>
+          <MultiPlatformSelector
+            selectedPlatforms={selectedPlatforms}
+            onChange={setSelectedPlatforms}
+            disabled={isLoading}
+          />
         </div>
       </div>
 
-      {/* Copy per Platform */}
-      {selectedProfile && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Contenido para {selectedProfile.platform}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <Label htmlFor="copy">Texto de la publicación</Label>
-              <Textarea
-                value={getCopyForPlatform(selectedProfile.platform)}
-                onChange={(e) => updateCopy(selectedProfile.platform, e.target.value)}
-                placeholder="Escribe el contenido de la publicación..."
-                rows={4}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Copies per Platform */}
+      <PlatformCopiesEditor
+        selectedPlatforms={selectedPlatforms}
+        copies={copies}
+        onChange={setCopies}
+      />
 
       <Separator />
 
@@ -297,7 +226,7 @@ export const PostForm = ({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading || selectedPlatforms.length === 0}>
           {isLoading ? 'Guardando...' : initialData ? 'Actualizar' : 'Crear'} Publicación
         </Button>
       </div>

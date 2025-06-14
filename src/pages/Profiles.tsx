@@ -191,7 +191,7 @@ const Profiles = () => {
               ))}
             </div>
           </CardContent>
-        </CardContent>
+        </Card>
       )}
     </div>
   );

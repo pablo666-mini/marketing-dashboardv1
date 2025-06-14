@@ -32,6 +32,7 @@ interface PostFormProps {
   onSubmit: (data: any) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  defaultLaunchId?: string;
 }
 
 const contentTypes: ContentType[] = ['Post', 'Reel', 'Story', 'Video'];
@@ -43,7 +44,8 @@ export const PostForm = ({
   initialData, 
   onSubmit, 
   onCancel, 
-  isLoading 
+  isLoading,
+  defaultLaunchId
 }: PostFormProps) => {
   const [formData, setFormData] = useState({
     productId: initialData?.product_id || '',
@@ -52,7 +54,8 @@ export const PostForm = ({
     contentType: initialData?.content_type || 'Post' as ContentType,
     contentFormat: initialData?.content_format || '1:1' as ContentFormat,
     hashtags: initialData?.hashtags || [],
-    copies: initialData?.copies || []
+    copies: initialData?.copies || [],
+    launchId: initialData?.launch_id || defaultLaunchId || ''
   });
 
   const [newHashtag, setNewHashtag] = useState('');

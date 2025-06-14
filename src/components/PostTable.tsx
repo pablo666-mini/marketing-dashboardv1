@@ -17,7 +17,8 @@ import { es } from 'date-fns/locale';
 import { 
   SocialPost, 
   SocialProfile, 
-  Product, 
+  Product,
+  Launch,
   PostStatus, 
   ContentType 
 } from '@/types';
@@ -26,6 +27,7 @@ interface PostTableProps {
   posts: SocialPost[];
   profiles: SocialProfile[];
   products: Product[];
+  launches?: Launch[];
   onEdit: (post: SocialPost) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: PostStatus) => void;
@@ -55,6 +57,7 @@ export const PostTable = ({
   posts,
   profiles,
   products,
+  launches = [],
   onEdit,
   onDelete,
   onStatusChange,
@@ -72,6 +75,12 @@ export const PostTable = ({
   const getProductName = (productId: string) => {
     const product = products.find(p => p.id === productId);
     return product ? product.name : 'Producto no encontrado';
+  };
+
+  const getLaunchName = (launchId: string | null) => {
+    if (!launchId) return null;
+    const launch = launches.find(l => l.id === launchId);
+    return launch ? launch.name : 'Lanzamiento no encontrado';
   };
 
   return (
@@ -120,6 +129,7 @@ export const PostTable = ({
               <TableHead>Perfil</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Formato</TableHead>
+              <TableHead>Lanzamiento</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
@@ -127,7 +137,7 @@ export const PostTable = ({
           <TableBody>
             {posts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   No hay publicaciones que coincidan con los filtros seleccionados
                 </TableCell>
               </TableRow>
@@ -165,6 +175,14 @@ export const PostTable = ({
                   
                   <TableCell>
                     <Badge variant="secondary">{post.content_format}</Badge>
+                  </TableCell>
+
+                  <TableCell>
+                    {post.launch_id && (
+                      <Badge variant="outline" className="text-xs">
+                        {getLaunchName(post.launch_id)}
+                      </Badge>
+                    )}
                   </TableCell>
                   
                   <TableCell>

@@ -26,7 +26,8 @@ export const CreateProfileDialog = () => {
   const handlePlatformChange = (value: string) => {
     if (value === 'custom') {
       setShowCustomPlatform(true);
-      setFormData(prev => ({ ...prev, platform: '' }));
+      setCustomPlatform('');
+      setFormData(prev => ({ ...prev, platform: '' as Platform }));
     } else {
       setShowCustomPlatform(false);
       setCustomPlatform('');
@@ -36,12 +37,14 @@ export const CreateProfileDialog = () => {
 
   const handleCustomPlatformChange = (value: string) => {
     setCustomPlatform(value);
+    // For custom platforms, we store the custom value directly as the platform
     setFormData(prev => ({ ...prev, platform: value as Platform }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Use custom platform if it's being used, otherwise use selected platform
     const finalPlatform = showCustomPlatform ? customPlatform : formData.platform;
     
     if (!formData.name || !formData.handle || !finalPlatform) {
@@ -69,7 +72,7 @@ export const CreateProfileDialog = () => {
   };
 
   const isFormValid = formData.name && formData.handle && 
-    (showCustomPlatform ? customPlatform : formData.platform);
+    (showCustomPlatform ? customPlatform.trim() : formData.platform);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

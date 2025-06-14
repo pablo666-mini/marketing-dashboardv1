@@ -146,11 +146,11 @@ const Launches = () => {
               </div>
             </div>
             <Select
-              value={filters.status?.[0] || ''}
+              value={filters.status?.[0] || 'all'}
               onValueChange={(value) => 
                 setFilters(prev => ({ 
                   ...prev, 
-                  status: value ? [value as LaunchStatus] : undefined 
+                  status: value !== 'all' ? [value as LaunchStatus] : undefined 
                 }))
               }
             >
@@ -158,7 +158,7 @@ const Launches = () => {
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos los estados</SelectItem>
+                <SelectItem value="all">Todos los estados</SelectItem>
                 <SelectItem value="Planned">Planificado</SelectItem>
                 <SelectItem value="In Progress">En Progreso</SelectItem>
                 <SelectItem value="Completed">Completado</SelectItem>
@@ -166,11 +166,11 @@ const Launches = () => {
               </SelectContent>
             </Select>
             <Select
-              value={filters.category?.[0] || ''}
+              value={filters.category?.[0] || 'all'}
               onValueChange={(value) => 
                 setFilters(prev => ({ 
                   ...prev, 
-                  category: value ? [value as LaunchCategory] : undefined 
+                  category: value !== 'all' ? [value as LaunchCategory] : undefined 
                 }))
               }
             >
@@ -178,7 +178,7 @@ const Launches = () => {
                 <SelectValue placeholder="Categoría" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas las categorías</SelectItem>
+                <SelectItem value="all">Todas las categorías</SelectItem>
                 <SelectItem value="Product Launch">Lanzamiento de Producto</SelectItem>
                 <SelectItem value="Campaign">Campaña</SelectItem>
                 <SelectItem value="Update">Actualización</SelectItem>
@@ -186,11 +186,11 @@ const Launches = () => {
               </SelectContent>
             </Select>
             <Select
-              value={filters.productId || ''}
+              value={filters.productId || 'all'}
               onValueChange={(value) => 
                 setFilters(prev => ({ 
                   ...prev, 
-                  productId: value || undefined 
+                  productId: value !== 'all' ? value : undefined 
                 }))
               }
             >
@@ -198,7 +198,7 @@ const Launches = () => {
                 <SelectValue placeholder="Producto" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos los productos</SelectItem>
+                <SelectItem value="all">Todos los productos</SelectItem>
                 {products?.map((product) => (
                   <SelectItem key={product.id} value={product.id}>
                     {product.name}

@@ -52,7 +52,7 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
   } = useForm<FormData>({
     defaultValues: {
       name: launch?.name || '',
-      product_id: launch?.product_id || '',
+      product_id: launch?.product_id || 'none',
       category: launch?.category || 'Other',
       status: launch?.status || 'Planned',
       start_date: launch ? new Date(launch.start_date) : undefined,
@@ -70,7 +70,7 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
 
     const launchData = {
       name: data.name,
-      product_id: data.product_id || null,
+      product_id: data.product_id !== 'none' ? data.product_id : null,
       category: data.category,
       status: data.status,
       start_date: data.start_date.toISOString(),
@@ -131,7 +131,7 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
                 <SelectValue placeholder="Seleccionar producto (opcional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Sin producto específico</SelectItem>
+                <SelectItem value="none">Sin producto específico</SelectItem>
                 {products?.map((product) => (
                   <SelectItem key={product.id} value={product.id}>
                     {product.name}

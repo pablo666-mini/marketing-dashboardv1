@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,7 +48,7 @@ export const CreateProfileDialog = () => {
     createProfile.mutate({
       name: formData.name,
       handle: formData.handle,
-      platform: platformValue,
+      platform: platformValue as any, // Cast to any to allow custom platform names
       active: formData.active
     }, {
       onSuccess: () => {

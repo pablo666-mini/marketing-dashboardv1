@@ -2,9 +2,29 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import type { SocialPost, CreateSocialPost, UpdateSocialPost } from '@/types/supabase';
+import type { SocialPost, CreateSocialPost, UpdateSocialPost, PlatformCopy } from '@/types/supabase';
 
 const QUERY_KEY = ['social-posts'];
+
+// Helper function to parse copies from database JSON to PlatformCopy[]
+const parseCopies = (copies: any): PlatformCopy[] | null => {
+  if (!copies) return null;
+  if (Array.isArray(copies)) return copies as PlatformCopy[];
+  if (typeof copies === 'string') {
+    try {
+      return JSON.parse(copies) as PlatformCopy[];
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
+// Helper function to transform database post to typed SocialPost
+const transformPost = (post: any): SocialPost => ({
+  ...post,
+  copies: parseCopies(post.copies)
+});
 
 export const useSocialPosts = () => {
   return useQuery({
@@ -21,7 +41,7 @@ export const useSocialPosts = () => {
         throw new Error(error.message);
       }
 
-      return data || [];
+      return (data || []).map(transformPost);
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
@@ -44,7 +64,7 @@ export const useSocialPostsByDateRange = (startDate: string, endDate: string, en
         throw new Error(error.message);
       }
 
-      return data || [];
+      return (data || []).map(transformPost);
     },
     enabled,
     staleTime: 2 * 60 * 1000,
@@ -67,7 +87,7 @@ export const useSocialPostsByLaunch = (launchId: string) => {
         throw new Error(error.message);
       }
 
-      return data || [];
+      return (data || []).map(transformPost);
     },
     enabled: !!launchId,
     staleTime: 2 * 60 * 1000,
@@ -91,7 +111,7 @@ export const useCreateSocialPost = () => {
         throw new Error(error.message);
       }
 
-      return data;
+      return transformPost(data);
     },
     onSuccess: (newPost) => {
       queryClient.setQueryData(QUERY_KEY, (old: SocialPost[] | undefined) => {
@@ -141,7 +161,7 @@ export const useUpdateSocialPost = () => {
         throw new Error(error.message);
       }
 
-      return data;
+      return transformPost(data);
     },
     onSuccess: (updatedPost) => {
       queryClient.setQueryData(QUERY_KEY, (old: SocialPost[] | undefined) => {

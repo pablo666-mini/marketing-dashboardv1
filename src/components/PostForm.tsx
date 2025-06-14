@@ -54,7 +54,7 @@ export const PostForm = ({
     contentType: initialData?.content_type || 'Post' as ContentType,
     contentFormat: initialData?.content_format || '1:1' as ContentFormat,
     hashtags: initialData?.hashtags || [],
-    copies: initialData?.copies || [],
+    copies: initialData?.copies || [] as PlatformCopy[],
     launchId: initialData?.launch_id || defaultLaunchId || ''
   });
 
@@ -74,7 +74,7 @@ export const PostForm = ({
     const submitData = {
       ...formData,
       date: formData.date.toISOString(),
-      copies: formData.copies.length > 0 ? formData.copies : [
+      copies: Array.isArray(formData.copies) && formData.copies.length > 0 ? formData.copies : [
         {
           platform: selectedProfile?.platform || 'Instagram',
           content: '',
@@ -106,9 +106,11 @@ export const PostForm = ({
 
   const updateCopy = (platform: Platform, content: string) => {
     setFormData(prev => {
-      const existingCopyIndex = prev.copies.findIndex(c => c.platform === platform);
+      const copies = Array.isArray(prev.copies) ? prev.copies : [];
+      const existingCopyIndex = copies.findIndex(c => c.platform === platform);
+      
       if (existingCopyIndex >= 0) {
-        const updatedCopies = [...prev.copies];
+        const updatedCopies = [...copies];
         updatedCopies[existingCopyIndex] = {
           ...updatedCopies[existingCopyIndex],
           content,
@@ -118,13 +120,14 @@ export const PostForm = ({
       } else {
         return {
           ...prev,
-          copies: [...prev.copies, { platform, content, hashtags: prev.hashtags }]
+          copies: [...copies, { platform, content, hashtags: prev.hashtags }]
         };
       }
     });
   };
 
   const getCopyForPlatform = (platform: Platform) => {
+    if (!Array.isArray(formData.copies)) return '';
     return formData.copies.find(c => c.platform === platform)?.content || '';
   };
 

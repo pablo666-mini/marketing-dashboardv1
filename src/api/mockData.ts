@@ -8,7 +8,8 @@ import {
   Platform,
   ContentType,
   PostStatus,
-  ContentFormat
+  ContentFormat,
+  PlatformCopy
 } from '@/types';
 
 // Mock Social Profiles
@@ -121,7 +122,8 @@ export const mockPosts: SocialPost[] = [
     hashtags: ['#miniland', '#dolls2024', '#diversidad', '#inclusion'],
     status: 'Approved',
     created_at: '2024-06-01T00:00:00Z',
-    updated_at: '2024-06-05T00:00:00Z'
+    updated_at: '2024-06-05T00:00:00Z',
+    launch_id: null
   },
   {
     id: '2',
@@ -141,7 +143,8 @@ export const mockPosts: SocialPost[] = [
     hashtags: ['#miniland', '#dolls2024', '#representacion', '#diversidad', '#fyp'],
     status: 'Pending',
     created_at: '2024-06-02T00:00:00Z',
-    updated_at: '2024-06-02T00:00:00Z'
+    updated_at: '2024-06-02T00:00:00Z',
+    launch_id: null
   },
   {
     id: '3',
@@ -161,7 +164,8 @@ export const mockPosts: SocialPost[] = [
     hashtags: ['#educacion', '#tecnologia', '#innovacion', '#miniland'],
     status: 'Published',
     created_at: '2024-06-03T00:00:00Z',
-    updated_at: '2024-06-10T00:00:00Z'
+    updated_at: '2024-06-10T00:00:00Z',
+    launch_id: null
   }
 ];
 

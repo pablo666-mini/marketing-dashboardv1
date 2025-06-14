@@ -7,7 +7,8 @@ import {
   GeneralInfo, 
   ApiResponse,
   CreatePostForm,
-  UpdatePostForm
+  UpdatePostForm,
+  PlatformCopy
 } from '@/types';
 import { mockProfiles, mockProducts, mockPosts, mockGeneralInfo } from './mockData';
 
@@ -87,7 +88,8 @@ export const createPost = async (postData: CreatePostForm): Promise<ApiResponse<
     media_resources_ids: [],
     status: 'Pending',
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    launch_id: null
   };
 
   posts.push(newPost);

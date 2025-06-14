@@ -19,6 +19,20 @@ export type LaunchCategory = 'Product Launch' | 'Campaign' | 'Update' | 'Other';
 export type LaunchStatus = 'Planned' | 'In Progress' | 'Completed' | 'Canceled';
 export type PhaseStatus = 'Not Started' | 'In Progress' | 'Completed' | 'Blocked';
 
+// Platform-specific copy content
+export interface PlatformCopy {
+  platform: Platform;
+  content: string;
+  hashtags: string[];
+}
+
+// Override SocialPost type to use proper types instead of Json
+import { SocialPost as SupabaseSocialPost } from './supabase';
+
+export interface SocialPost extends Omit<SupabaseSocialPost, 'copies'> {
+  copies: PlatformCopy[] | null;
+}
+
 // Launch interface
 export interface Launch {
   id: string;
@@ -104,13 +118,6 @@ export interface ApiResponse<T> {
   data: T;
   success: boolean;
   message: string;
-}
-
-// Platform-specific copy content
-export interface PlatformCopy {
-  platform: Platform;
-  content: string;
-  hashtags: string[];
 }
 
 // Form data for creating new posts

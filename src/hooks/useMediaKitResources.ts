@@ -7,7 +7,7 @@ export interface MediaKitResource {
   id: string;
   name: string;
   description: string | null;
-  category: 'press_convocation' | 'press_note' | 'banners' | 'photos' | 'videos';
+  category: string; // Changed to accept any string
   url: string;
   format: string | null;
   file_size: number | null;
@@ -20,7 +20,7 @@ export interface MediaKitResource {
 export interface CreateMediaKitResourceInput {
   name: string;
   description?: string;
-  category: 'press_convocation' | 'press_note' | 'banners' | 'photos' | 'videos';
+  category: string; // Changed to accept any string
   url: string;
   format?: string;
   file_size?: number;
@@ -31,7 +31,7 @@ export interface CreateMediaKitResourceInput {
 export interface UpdateMediaKitResourceInput {
   name?: string;
   description?: string;
-  category?: 'press_convocation' | 'press_note' | 'banners' | 'photos' | 'videos';
+  category?: string; // Changed to accept any string
   url?: string;
   format?: string;
   file_size?: number;

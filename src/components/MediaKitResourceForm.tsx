@@ -23,6 +23,7 @@ const resourceCategories = [
   { value: 'banners', label: 'Banners' },
   { value: 'photos', label: 'Fotografías' },
   { value: 'videos', label: 'Videos' },
+  { value: 'custom', label: 'Categoría personalizada...' },
 ];
 
 const commonFormats = [
@@ -34,6 +35,10 @@ export const MediaKitResourceForm = ({ resource, trigger, onClose }: MediaKitRes
   const [name, setName] = useState(resource?.name || '');
   const [description, setDescription] = useState(resource?.description || '');
   const [category, setCategory] = useState<string>(resource?.category || '');
+  const [customCategory, setCustomCategory] = useState('');
+  const [isCustomCategory, setIsCustomCategory] = useState(
+    resource?.category ? !resourceCategories.some(cat => cat.value === resource.category && cat.value !== 'custom') : false
+  );
   const [url, setUrl] = useState(resource?.url || '');
   const [format, setFormat] = useState(resource?.format || '');
   const [fileSize, setFileSize] = useState(resource?.file_size?.toString() || '');
@@ -47,17 +52,38 @@ export const MediaKitResourceForm = ({ resource, trigger, onClose }: MediaKitRes
   const isEditing = !!resource;
   const isLoading = createResource.isPending || updateResource.isPending;
 
+  // Initialize custom category if editing an existing resource with a custom category
+  useState(() => {
+    if (resource?.category && !resourceCategories.some(cat => cat.value === resource.category && cat.value !== 'custom')) {
+      setCustomCategory(resource.category);
+      setIsCustomCategory(true);
+      setCategory('custom');
+    }
+  });
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    if (value === 'custom') {
+      setIsCustomCategory(true);
+    } else {
+      setIsCustomCategory(false);
+      setCustomCategory('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim() || !category || !url.trim()) {
+    const finalCategory = isCustomCategory ? customCategory.trim() : category;
+    
+    if (!name.trim() || !finalCategory || !url.trim()) {
       return;
     }
 
     const formData = {
       name: name.trim(),
       description: description.trim() || undefined,
-      category: category as any,
+      category: finalCategory as any,
       url: url.trim(),
       format: format.trim() || undefined,
       file_size: fileSize ? parseInt(fileSize) : undefined,
@@ -79,6 +105,8 @@ export const MediaKitResourceForm = ({ resource, trigger, onClose }: MediaKitRes
         setName('');
         setDescription('');
         setCategory('');
+        setCustomCategory('');
+        setIsCustomCategory(false);
         setUrl('');
         setFormat('');
         setFileSize('');
@@ -151,18 +179,40 @@ export const MediaKitResourceForm = ({ resource, trigger, onClose }: MediaKitRes
 
             <div className="space-y-2">
               <Label htmlFor="category">Categoría *</Label>
-              <Select value={category} onValueChange={setCategory} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona la categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {resourceCategories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {!isCustomCategory ? (
+                <Select value={category} onValueChange={handleCategoryChange} required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona la categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resourceCategories.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    placeholder="Escribe la categoría del recurso"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsCustomCategory(false);
+                      setCustomCategory('');
+                      setCategory('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 

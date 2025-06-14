@@ -9,7 +9,7 @@ import {
 import { HelpCircle } from 'lucide-react';
 
 interface TooltipWrapperProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   content: string;
   side?: 'top' | 'right' | 'bottom' | 'left';
   showIcon?: boolean;
@@ -27,12 +27,16 @@ export const TooltipWrapper = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center">
-            {children}
-            {showIcon && (
-              <HelpCircle className={iconClassName} />
-            )}
-          </div>
+          {showIcon && !children ? (
+            <HelpCircle className={iconClassName} />
+          ) : (
+            <div className="flex items-center">
+              {children}
+              {showIcon && (
+                <HelpCircle className={iconClassName} />
+              )}
+            </div>
+          )}
         </TooltipTrigger>
         <TooltipContent side={side} className="max-w-xs">
           <p className="text-sm">{content}</p>

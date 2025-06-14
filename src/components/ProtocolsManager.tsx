@@ -21,17 +21,28 @@ export const ProtocolsManager = () => {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterActive, setFilterActive] = useState<string>('all');
 
+  // Get unique protocol types from the data
+  const uniqueTypes = protocols ? Array.from(new Set(protocols.map(p => p.type))) : [];
+  
   const protocolTypes = [
     { value: 'all', label: 'Todos los tipos' },
-    { value: 'image_naming', label: 'Nomenclatura de Imágenes' },
-    { value: 'briefing', label: 'Estructura de Briefing' },
-    { value: 'hashtags', label: 'Estrategia de Hashtags' },
-    { value: 'general', label: 'General' },
+    ...uniqueTypes.map(type => ({
+      value: type,
+      label: getTypeLabel(type)
+    }))
   ];
 
-  const getTypeLabel = (type: string) => {
-    return protocolTypes.find(t => t.value === type)?.label || type;
-  };
+  function getTypeLabel(type: string) {
+    const predefinedTypes = {
+      'image_naming': 'Nomenclatura de Imágenes',
+      'briefing': 'Estructura de Briefing',
+      'hashtags': 'Estrategia de Hashtags',
+      'general': 'General'
+    };
+    
+    return predefinedTypes[type as keyof typeof predefinedTypes] || 
+           type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ');
+  }
 
   const getTypeBadgeVariant = (type: string) => {
     switch (type) {

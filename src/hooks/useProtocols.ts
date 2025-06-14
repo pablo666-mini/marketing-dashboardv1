@@ -7,7 +7,7 @@ export interface Protocol {
   id: string;
   title: string;
   description: string | null;
-  type: 'image_naming' | 'briefing' | 'hashtags' | 'general';
+  type: string; // Changed to accept any string
   content: string;
   active: boolean;
   created_at: string;
@@ -17,7 +17,7 @@ export interface Protocol {
 export interface CreateProtocolInput {
   title: string;
   description?: string;
-  type: 'image_naming' | 'briefing' | 'hashtags' | 'general';
+  type: string; // Changed to accept any string
   content: string;
   active?: boolean;
 }
@@ -25,7 +25,7 @@ export interface CreateProtocolInput {
 export interface UpdateProtocolInput {
   title?: string;
   description?: string;
-  type?: 'image_naming' | 'briefing' | 'hashtags' | 'general';
+  type?: string; // Changed to accept any string
   content?: string;
   active?: boolean;
 }

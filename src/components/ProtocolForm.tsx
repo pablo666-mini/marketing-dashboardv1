@@ -21,6 +21,7 @@ const protocolTypes = [
   { value: 'briefing', label: 'Estructura de Briefing' },
   { value: 'hashtags', label: 'Estrategia de Hashtags' },
   { value: 'general', label: 'General' },
+  { value: 'custom', label: 'Tipo personalizado...' },
 ];
 
 export const ProtocolForm = ({ protocol, trigger, onClose }: ProtocolFormProps) => {
@@ -28,6 +29,10 @@ export const ProtocolForm = ({ protocol, trigger, onClose }: ProtocolFormProps) 
   const [title, setTitle] = useState(protocol?.title || '');
   const [description, setDescription] = useState(protocol?.description || '');
   const [type, setType] = useState<string>(protocol?.type || '');
+  const [customType, setCustomType] = useState('');
+  const [isCustomType, setIsCustomType] = useState(
+    protocol?.type ? !protocolTypes.some(pt => pt.value === protocol.type && pt.value !== 'custom') : false
+  );
   const [content, setContent] = useState(protocol?.content || '');
   const [active, setActive] = useState(protocol?.active ?? true);
 
@@ -37,17 +42,38 @@ export const ProtocolForm = ({ protocol, trigger, onClose }: ProtocolFormProps) 
   const isEditing = !!protocol;
   const isLoading = createProtocol.isPending || updateProtocol.isPending;
 
+  // Initialize custom type if editing an existing protocol with a custom type
+  useState(() => {
+    if (protocol?.type && !protocolTypes.some(pt => pt.value === protocol.type && pt.value !== 'custom')) {
+      setCustomType(protocol.type);
+      setIsCustomType(true);
+      setType('custom');
+    }
+  });
+
+  const handleTypeChange = (value: string) => {
+    setType(value);
+    if (value === 'custom') {
+      setIsCustomType(true);
+    } else {
+      setIsCustomType(false);
+      setCustomType('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title.trim() || !type || !content.trim()) {
+    const finalType = isCustomType ? customType.trim() : type;
+    
+    if (!title.trim() || !finalType || !content.trim()) {
       return;
     }
 
     const formData = {
       title: title.trim(),
       description: description.trim() || undefined,
-      type: type as any,
+      type: finalType,
       content: content.trim(),
       active,
     };
@@ -66,6 +92,8 @@ export const ProtocolForm = ({ protocol, trigger, onClose }: ProtocolFormProps) 
         setTitle('');
         setDescription('');
         setType('');
+        setCustomType('');
+        setIsCustomType(false);
         setContent('');
         setActive(true);
       }
@@ -115,18 +143,40 @@ export const ProtocolForm = ({ protocol, trigger, onClose }: ProtocolFormProps) 
 
             <div className="space-y-2">
               <Label htmlFor="type">Tipo de Protocolo *</Label>
-              <Select value={type} onValueChange={setType} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona el tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {protocolTypes.map((protocolType) => (
-                    <SelectItem key={protocolType.value} value={protocolType.value}>
-                      {protocolType.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {!isCustomType ? (
+                <Select value={type} onValueChange={handleTypeChange} required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {protocolTypes.map((protocolType) => (
+                      <SelectItem key={protocolType.value} value={protocolType.value}>
+                        {protocolType.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    value={customType}
+                    onChange={(e) => setCustomType(e.target.value)}
+                    placeholder="Escribe el tipo de protocolo"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsCustomType(false);
+                      setCustomType('');
+                      setType('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 

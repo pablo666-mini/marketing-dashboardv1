@@ -1,9 +1,8 @@
 
-// Main layout component that wraps all pages
 import { Outlet } from 'react-router-dom';
-import { Sidebar } from '@/components/Sidebar';
+import Sidebar from '@/components/Sidebar';
 
-export const Layout = () => {
+const Layout = () => {
   return (
     <div className="min-h-screen flex bg-background">
       <Sidebar />
@@ -15,3 +14,5 @@ export const Layout = () => {
     </div>
   );
 };
+
+export default Layout;

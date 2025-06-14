@@ -127,6 +127,48 @@ export type Database = {
           },
         ]
       }
+      media_kit_resources: {
+        Row: {
+          active: boolean | null
+          category: string
+          created_at: string | null
+          description: string | null
+          file_size: number | null
+          format: string | null
+          id: string
+          name: string
+          tags: string[] | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          active?: boolean | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          file_size?: number | null
+          format?: string | null
+          id?: string
+          name: string
+          tags?: string[] | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          file_size?: number | null
+          format?: string | null
+          id?: string
+          name?: string
+          tags?: string[] | null
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       media_resources: {
         Row: {
           created_at: string | null
@@ -198,6 +240,39 @@ export type Database = {
           landing_url?: string | null
           name?: string
           sales_objectives?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      protocols: {
+        Row: {
+          active: boolean | null
+          content: string
+          created_at: string | null
+          description: string | null
+          id: string
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          content: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          content?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title?: string
+          type?: string
           updated_at?: string | null
         }
         Relationships: []

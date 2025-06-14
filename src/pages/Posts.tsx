@@ -1,11 +1,13 @@
 // Posts management page - create, edit, and manage social media posts
 import { useState } from 'react';
 import { usePosts, useActiveProfiles, useProducts, useCreatePost, useUpdatePost, useDeletePost } from '@/hooks/useApi';
+import { useLaunches } from '@/hooks/useLaunches';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Edit, Trash2, Eye, Filter } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { PostForm } from '@/components/PostForm';
 import { PostTable } from '@/components/PostTable';
@@ -15,6 +17,7 @@ const Posts = () => {
   const { data: posts, isLoading: postsLoading } = usePosts();
   const { data: activeProfiles, isLoading: profilesLoading } = useActiveProfiles();
   const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: launches } = useLaunches();
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
   const deletePost = useDeletePost();
@@ -23,6 +26,7 @@ const Posts = () => {
   const [editingPost, setEditingPost] = useState<SocialPost | null>(null);
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<ContentType | 'all'>('all');
+  const [launchFilter, setLaunchFilter] = useState<string | 'all'>('all');
 
   if (postsLoading || profilesLoading || productsLoading) {
     return (
@@ -83,6 +87,7 @@ const Posts = () => {
   const filteredPosts = posts?.filter(post => {
     if (statusFilter !== 'all' && post.status !== statusFilter) return false;
     if (typeFilter !== 'all' && post.content_type !== typeFilter) return false;
+    if (launchFilter !== 'all' && post.launch_id !== launchFilter) return false;
     return true;
   }) || [];
 
@@ -177,16 +182,38 @@ const Posts = () => {
       {/* Posts Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Publicaciones</CardTitle>
-          <CardDescription>
-            Gestiona y organiza todas las publicaciones programadas
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Lista de Publicaciones</CardTitle>
+              <CardDescription>
+                Gestiona y organiza todas las publicaciones programadas
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select value={launchFilter} onValueChange={setLaunchFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filtrar por lanzamiento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los lanzamientos</SelectItem>
+                  <SelectItem value="none">Sin lanzamiento</SelectItem>
+                  {launches?.map((launch) => (
+                    <SelectItem key={launch.id} value={launch.id}>
+                      {launch.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <PostTable
             posts={filteredPosts}
             profiles={activeProfiles || []}
             products={products || []}
+            launches={launches || []}
             onEdit={setEditingPost}
             onDelete={handleDeletePost}
             onStatusChange={handleStatusChange}

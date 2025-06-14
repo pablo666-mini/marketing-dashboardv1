@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -51,6 +50,29 @@ export const useSocialPostsByDateRange = (startDate: string, endDate: string, en
   });
 };
 
+export const useSocialPostsByLaunch = (launchId: string) => {
+  return useQuery({
+    queryKey: [...QUERY_KEY, 'launch', launchId],
+    queryFn: async (): Promise<SocialPost[]> => {
+      console.log(`Fetching social posts for launch: ${launchId}`);
+      const { data, error } = await supabase
+        .from('social_posts')
+        .select('*')
+        .eq('launch_id', launchId)
+        .order('post_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching social posts by launch:', error);
+        throw new Error(error.message);
+      }
+
+      return data || [];
+    },
+    enabled: !!launchId,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
 export const useCreateSocialPost = () => {
   const queryClient = useQueryClient();
 
@@ -77,6 +99,13 @@ export const useCreateSocialPost = () => {
           new Date(a.post_date).getTime() - new Date(b.post_date).getTime()
         );
       });
+
+      // Invalidate launch-specific queries if post has launch_id
+      if (newPost.launch_id) {
+        queryClient.invalidateQueries({ 
+          queryKey: [...QUERY_KEY, 'launch', newPost.launch_id] 
+        });
+      }
 
       toast({
         title: "Publicación creada",
@@ -121,6 +150,13 @@ export const useUpdateSocialPost = () => {
         );
       });
 
+      // Invalidate launch-specific queries if post has launch_id
+      if (updatedPost.launch_id) {
+        queryClient.invalidateQueries({ 
+          queryKey: [...QUERY_KEY, 'launch', updatedPost.launch_id] 
+        });
+      }
+
       toast({
         title: "Publicación actualizada",
         description: "La publicación ha sido actualizada exitosamente.",
@@ -156,6 +192,11 @@ export const useDeleteSocialPost = () => {
       queryClient.setQueryData(QUERY_KEY, (old: SocialPost[] | undefined) => {
         if (!old) return [];
         return old.filter(post => post.id !== deletedId);
+      });
+
+      // Invalidate all launch-specific queries since we don't know which launch this post belonged to
+      queryClient.invalidateQueries({ 
+        queryKey: [...QUERY_KEY, 'launch'] 
       });
 
       toast({

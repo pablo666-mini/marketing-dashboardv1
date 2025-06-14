@@ -210,6 +210,7 @@ export type Database = {
           created_at: string | null
           hashtags: string[] | null
           id: string
+          launch_id: string | null
           media_resources_ids: string[] | null
           post_date: string
           product_id: string | null
@@ -224,6 +225,7 @@ export type Database = {
           created_at?: string | null
           hashtags?: string[] | null
           id?: string
+          launch_id?: string | null
           media_resources_ids?: string[] | null
           post_date: string
           product_id?: string | null
@@ -238,6 +240,7 @@ export type Database = {
           created_at?: string | null
           hashtags?: string[] | null
           id?: string
+          launch_id?: string | null
           media_resources_ids?: string[] | null
           post_date?: string
           product_id?: string | null
@@ -246,6 +249,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "social_posts_launch_id_fkey"
+            columns: ["launch_id"]
+            isOneToOne: false
+            referencedRelation: "launches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "social_posts_product_id_fkey"
             columns: ["product_id"]

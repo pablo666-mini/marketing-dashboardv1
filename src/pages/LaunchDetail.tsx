@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLaunch, useUpdateLaunch, useDeleteLaunch } from '@/hooks/useLaunches';
@@ -28,6 +27,7 @@ import {
 import LaunchForm from '@/components/LaunchForm';
 import LaunchPhaseForm from '@/components/LaunchPhaseForm';
 import LaunchPhaseCard from '@/components/LaunchPhaseCard';
+import LaunchPosts from '@/components/LaunchPosts';
 
 const LaunchDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -160,6 +160,7 @@ const LaunchDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Information */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Launch details card */}
           <Card>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -219,6 +220,9 @@ const LaunchDetail = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Social Posts Section */}
+          <LaunchPosts launchId={launch.id} launchName={launch.name} />
 
           {/* Phases Section */}
           <Card>

@@ -14,6 +14,91 @@ export type PostStatus = 'Draft' | 'Pending' | 'Approved' | 'Published' | 'Cance
 // Content format enum - aspect ratios and formats
 export type ContentFormat = '9:16' | '4:5' | '1:1' | 'None';
 
+// Launch management enums
+export type LaunchCategory = 'Product Launch' | 'Campaign' | 'Update' | 'Other';
+export type LaunchStatus = 'Planned' | 'In Progress' | 'Completed' | 'Canceled';
+export type PhaseStatus = 'Not Started' | 'In Progress' | 'Completed' | 'Blocked';
+
+// Launch interface
+export interface Launch {
+  id: string;
+  product_id: string | null;
+  name: string;
+  category: LaunchCategory;
+  status: LaunchStatus;
+  start_date: string;
+  end_date: string;
+  description: string | null;
+  responsible: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Launch phase interface
+export interface LaunchPhase {
+  id: string;
+  launch_id: string;
+  name: string;
+  status: PhaseStatus;
+  start_date: string;
+  end_date: string;
+  responsible: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Launch input types for forms
+export interface CreateLaunchInput {
+  product_id?: string | null;
+  name: string;
+  category: LaunchCategory;
+  status?: LaunchStatus;
+  start_date: string;
+  end_date: string;
+  description?: string | null;
+  responsible: string;
+}
+
+export interface UpdateLaunchInput {
+  product_id?: string | null;
+  name?: string;
+  category?: LaunchCategory;
+  status?: LaunchStatus;
+  start_date?: string;
+  end_date?: string;
+  description?: string | null;
+  responsible?: string;
+}
+
+// Launch phase input types
+export interface CreateLaunchPhaseInput {
+  launch_id: string;
+  name: string;
+  status?: PhaseStatus;
+  start_date: string;
+  end_date: string;
+  responsible: string;
+  notes?: string | null;
+}
+
+export interface UpdateLaunchPhaseInput {
+  name?: string;
+  status?: PhaseStatus;
+  start_date?: string;
+  end_date?: string;
+  responsible?: string;
+  notes?: string | null;
+}
+
+// Launch filters
+export interface LaunchFilters {
+  status?: LaunchStatus[];
+  category?: LaunchCategory[];
+  productId?: string;
+  dateRange?: { start: string; end: string };
+}
+
 // Legacy API response wrapper for mock API compatibility
 export interface ApiResponse<T> {
   data: T;

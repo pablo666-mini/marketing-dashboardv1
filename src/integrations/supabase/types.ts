@@ -30,6 +30,103 @@ export type Database = {
         }
         Relationships: []
       }
+      launch_phases: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          launch_id: string
+          name: string
+          notes: string | null
+          responsible: string
+          start_date: string
+          status: Database["public"]["Enums"]["phase_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          launch_id: string
+          name: string
+          notes?: string | null
+          responsible: string
+          start_date: string
+          status?: Database["public"]["Enums"]["phase_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          launch_id?: string
+          name?: string
+          notes?: string | null
+          responsible?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["phase_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "launch_phases_launch_id_fkey"
+            columns: ["launch_id"]
+            isOneToOne: false
+            referencedRelation: "launches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      launches: {
+        Row: {
+          category: Database["public"]["Enums"]["launch_category"]
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          name: string
+          product_id: string | null
+          responsible: string
+          start_date: string
+          status: Database["public"]["Enums"]["launch_status"]
+          updated_at: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["launch_category"]
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          name: string
+          product_id?: string | null
+          responsible: string
+          start_date: string
+          status?: Database["public"]["Enums"]["launch_status"]
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["launch_category"]
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          name?: string
+          product_id?: string | null
+          responsible?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["launch_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "launches_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_resources: {
         Row: {
           created_at: string | null
@@ -204,7 +301,10 @@ export type Database = {
     }
     Enums: {
       content_type: "Post" | "Reel" | "Story" | "Video"
+      launch_category: "Product Launch" | "Campaign" | "Update" | "Other"
+      launch_status: "Planned" | "In Progress" | "Completed" | "Canceled"
       media_type: "banner" | "photo" | "video"
+      phase_status: "Not Started" | "In Progress" | "Completed" | "Blocked"
       platform_type:
         | "Instagram"
         | "TikTok"
@@ -329,7 +429,10 @@ export const Constants = {
   public: {
     Enums: {
       content_type: ["Post", "Reel", "Story", "Video"],
+      launch_category: ["Product Launch", "Campaign", "Update", "Other"],
+      launch_status: ["Planned", "In Progress", "Completed", "Canceled"],
       media_type: ["banner", "photo", "video"],
+      phase_status: ["Not Started", "In Progress", "Completed", "Blocked"],
       platform_type: [
         "Instagram",
         "TikTok",

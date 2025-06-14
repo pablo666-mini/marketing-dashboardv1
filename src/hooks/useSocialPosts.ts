@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -21,17 +20,18 @@ const parseCopies = (copies: any): PlatformCopy[] | null => {
   return null;
 };
 
-// Helper function to transform database post to typed SocialPost
+// Helper function to transform database post to typed SocialPost with multi-profile support
 const transformPost = (post: any): SocialPost => ({
   ...post,
-  copies: parseCopies(post.copies)
+  copies: parseCopies(post.copies),
+  profile_ids: post.profile_ids || (post.profile_id ? [post.profile_id] : []) // Handle legacy single profile
 });
 
 export const useSocialPosts = () => {
   return useQuery({
     queryKey: QUERY_KEY,
     queryFn: async (): Promise<SocialPost[]> => {
-      console.log('Fetching social posts...');
+      console.log('Fetching social posts with multi-profile support...');
       const { data, error } = await supabase
         .from('social_posts')
         .select('*')
@@ -52,7 +52,7 @@ export const useSocialPostsByDateRange = (startDate: string, endDate: string, en
   return useQuery({
     queryKey: [...QUERY_KEY, 'date-range', startDate, endDate],
     queryFn: async (): Promise<SocialPost[]> => {
-      console.log(`Fetching social posts from ${startDate} to ${endDate}...`);
+      console.log(`Fetching multi-profile social posts from ${startDate} to ${endDate}...`);
       const { data, error } = await supabase
         .from('social_posts')
         .select('*')
@@ -76,7 +76,7 @@ export const useSocialPostsByLaunch = (launchId: string) => {
   return useQuery({
     queryKey: [...QUERY_KEY, 'launch', launchId],
     queryFn: async (): Promise<SocialPost[]> => {
-      console.log(`Fetching social posts for launch: ${launchId}`);
+      console.log(`Fetching multi-profile social posts for launch: ${launchId}`);
       const { data, error } = await supabase
         .from('social_posts')
         .select('*')
@@ -99,16 +99,23 @@ export const useCreateSocialPost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (post: CreateSocialPost): Promise<SocialPost> => {
-      console.log('Creating social post:', post);
+    mutationFn: async (post: CreateSocialPost & { profile_ids?: string[] }): Promise<SocialPost> => {
+      console.log('Creating multi-profile social post:', post);
+      
+      // Prepare data for database insertion
+      const postData = {
+        ...post,
+        profile_ids: post.profile_ids || (post.profile_id ? [post.profile_id] : [])
+      };
+
       const { data, error } = await supabase
         .from('social_posts')
-        .insert(post)
+        .insert(postData)
         .select()
         .single();
 
       if (error) {
-        console.error('Error creating social post:', error);
+        console.error('Error creating multi-profile social post:', error);
         throw new Error(error.message);
       }
 
@@ -129,15 +136,16 @@ export const useCreateSocialPost = () => {
         });
       }
 
+      const profileCount = newPost.profile_ids.length;
       toast({
-        title: "Publicación creada",
-        description: "La publicación ha sido creada exitosamente.",
+        title: "Publicación multi-perfil creada",
+        description: `La publicación ha sido creada para ${profileCount} perfil${profileCount > 1 ? 'es' : ''}.`,
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Error al crear la publicación",
+        description: error.message || "Error al crear la publicación multi-perfil",
         variant: "destructive",
       });
     },
@@ -148,17 +156,27 @@ export const useUpdateSocialPost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: UpdateSocialPost }): Promise<SocialPost> => {
-      console.log('Updating social post:', id, updates);
+    mutationFn: async ({ id, updates }: { 
+      id: string; 
+      updates: UpdateSocialPost & { profile_ids?: string[] }
+    }): Promise<SocialPost> => {
+      console.log('Updating multi-profile social post:', id, updates);
+      
+      // Prepare updates with multi-profile support
+      const updateData = {
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
+
       const { data, error } = await supabase
         .from('social_posts')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
 
       if (error) {
-        console.error('Error updating social post:', error);
+        console.error('Error updating multi-profile social post:', error);
         throw new Error(error.message);
       }
 
@@ -179,15 +197,16 @@ export const useUpdateSocialPost = () => {
         });
       }
 
+      const profileCount = updatedPost.profile_ids.length;
       toast({
-        title: "Publicación actualizada",
-        description: "La publicación ha sido actualizada exitosamente.",
+        title: "Publicación multi-perfil actualizada",
+        description: `La publicación ha sido actualizada para ${profileCount} perfil${profileCount > 1 ? 'es' : ''}.`,
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Error al actualizar la publicación",
+        description: error.message || "Error al actualizar la publicación multi-perfil",
         variant: "destructive",
       });
     },

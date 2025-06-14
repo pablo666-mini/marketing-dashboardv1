@@ -1,5 +1,5 @@
 
-// Table component for displaying and managing social media posts
+// Table component for displaying and managing multi-profile social media posts
 import { 
   Table, 
   TableBody, 
@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Edit, Trash2, Calendar, User } from 'lucide-react';
+import { Edit, Trash2, Calendar, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { 
@@ -67,9 +67,24 @@ export const PostTable = ({
   onTypeFilterChange
 }: PostTableProps) => {
   
-  const getProfileName = (profileId: string) => {
-    const profile = profiles.find(p => p.id === profileId);
-    return profile ? `${profile.name} (${profile.platform})` : 'Perfil no encontrado';
+  const getProfileNames = (profileIds: string[]) => {
+    if (!profileIds || profileIds.length === 0) return 'Sin perfiles';
+    
+    const postProfiles = profiles.filter(p => profileIds.includes(p.id));
+    if (postProfiles.length === 0) return 'Perfiles no encontrados';
+    
+    // Group by platform for better display
+    const byPlatform = postProfiles.reduce((acc, profile) => {
+      if (!acc[profile.platform]) acc[profile.platform] = [];
+      acc[profile.platform].push(profile);
+      return acc;
+    }, {} as Record<string, SocialProfile[]>);
+
+    return Object.entries(byPlatform).map(([platform, platformProfiles]) => ({
+      platform,
+      profiles: platformProfiles,
+      count: platformProfiles.length
+    }));
   };
 
   const getProductName = (productId: string) => {
@@ -126,7 +141,7 @@ export const PostTable = ({
             <TableRow>
               <TableHead>Fecha</TableHead>
               <TableHead>Producto</TableHead>
-              <TableHead>Perfil</TableHead>
+              <TableHead>Perfiles</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Formato</TableHead>
               <TableHead>Lanzamiento</TableHead>
@@ -142,90 +157,121 @@ export const PostTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              posts.map((post) => (
-                <TableRow key={post.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <div className="font-medium">
-                          {format(new Date(post.post_date), 'dd/MM/yyyy', { locale: es })}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {format(new Date(post.post_date), 'HH:mm')}
+              posts.map((post) => {
+                const profilesData = getProfileNames(post.profile_ids);
+                const isMultiProfile = post.profile_ids.length > 1;
+                
+                return (
+                  <TableRow key={post.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <div className="font-medium">
+                            {format(new Date(post.post_date), 'dd/MM/yyyy', { locale: es })}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {format(new Date(post.post_date), 'HH:mm')}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="font-medium">{getProductName(post.product_id || '')}</div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{getProfileName(post.profile_id || '')}</span>
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <Badge variant="outline">{post.content_type}</Badge>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <Badge variant="secondary">{post.content_format}</Badge>
-                  </TableCell>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div className="font-medium">{getProductName(post.product_id || '')}</div>
+                    </TableCell>
+                    
+                    <TableCell className="max-w-xs">
+                      <div className="flex items-start gap-2">
+                        <Users className={`h-4 w-4 mt-0.5 ${isMultiProfile ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <div className="space-y-1">
+                          {Array.isArray(profilesData) ? (
+                            profilesData.map(({ platform, profiles: platformProfiles, count }) => (
+                              <div key={platform} className="flex items-center gap-1">
+                                <Badge variant="outline" className="text-xs">
+                                  {platform}
+                                </Badge>
+                                {count > 1 ? (
+                                  <Badge variant="secondary" className="text-xs">
+                                    {count} perfiles
+                                  </Badge>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">
+                                    {platformProfiles[0]?.name}
+                                  </span>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-sm text-muted-foreground">{profilesData}</span>
+                          )}
+                          {isMultiProfile && (
+                            <Badge variant="default" className="text-xs">
+                              Multi-perfil
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <Badge variant="outline">{post.content_type}</Badge>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <Badge variant="secondary">{post.content_format}</Badge>
+                    </TableCell>
 
-                  <TableCell>
-                    {post.launch_id && (
-                      <Badge variant="outline" className="text-xs">
-                        {getLaunchName(post.launch_id)}
-                      </Badge>
-                    )}
-                  </TableCell>
-                  
-                  <TableCell>
-                    <Select 
-                      value={post.status || 'Draft'} 
-                      onValueChange={(value: PostStatus) => onStatusChange(post.id, value)}
-                    >
-                      <SelectTrigger className="w-32">
-                        <Badge className={statusColors[post.status || 'Draft']}>
-                          {statusLabels[post.status || 'Draft']}
+                    <TableCell>
+                      {post.launch_id && (
+                        <Badge variant="outline" className="text-xs">
+                          {getLaunchName(post.launch_id)}
                         </Badge>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Draft">Borrador</SelectItem>
-                        <SelectItem value="Pending">Pendiente</SelectItem>
-                        <SelectItem value="Approved">Aprobada</SelectItem>
-                        <SelectItem value="Published">Publicada</SelectItem>
-                        <SelectItem value="Canceled">Cancelada</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit(post)}
+                      )}
+                    </TableCell>
+                    
+                    <TableCell>
+                      <Select 
+                        value={post.status || 'Draft'} 
+                        onValueChange={(value: PostStatus) => onStatusChange(post.id, value)}
                       >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onDelete(post.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                        <SelectTrigger className="w-32">
+                          <Badge className={statusColors[post.status || 'Draft']}>
+                            {statusLabels[post.status || 'Draft']}
+                          </Badge>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Draft">Borrador</SelectItem>
+                          <SelectItem value="Pending">Pendiente</SelectItem>
+                          <SelectItem value="Approved">Aprobada</SelectItem>
+                          <SelectItem value="Published">Publicada</SelectItem>
+                          <SelectItem value="Canceled">Cancelada</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEdit(post)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onDelete(post.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>

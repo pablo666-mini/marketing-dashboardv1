@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -18,11 +18,10 @@ import {
   SocialPost, 
   ContentType, 
   ContentFormat, 
-  PlatformCopy,
-  Platform 
+  PlatformCopy 
 } from '@/types';
-import { MultiPlatformSelector } from '@/components/MultiPlatformSelector';
-import { PlatformCopiesEditor } from '@/components/PlatformCopiesEditor';
+import { MultiProfileSelector } from '@/components/MultiProfileSelector';
+import { MultiProfileCopiesEditor } from '@/components/MultiProfileCopiesEditor';
 
 interface PostFormProps {
   activeProfiles: SocialProfile[];
@@ -49,39 +48,43 @@ export const PostForm = ({
   const [formData, setFormData] = useState({
     productId: initialData?.product_id || '',
     date: initialData ? new Date(initialData.post_date) : new Date(),
-    profileId: initialData?.profile_id || '',
     contentType: initialData?.content_type || 'Post' as ContentType,
     contentFormat: initialData?.content_format || '1:1' as ContentFormat,
     hashtags: initialData?.hashtags || [],
     launchId: initialData?.launch_id || defaultLaunchId || ''
   });
 
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
+  const [selectedProfileIds, setSelectedProfileIds] = useState<string[]>([]);
   const [copies, setCopies] = useState<PlatformCopy[]>([]);
 
-  // Initialize platform selection and copies from initial data
+  // Initialize multi-profile selection and copies from initial data
   useEffect(() => {
-    if (initialData?.copies && Array.isArray(initialData.copies)) {
-      const platforms = initialData.copies.map(copy => copy.platform);
-      setSelectedPlatforms(platforms);
-      setCopies(initialData.copies);
-    } else if (formData.profileId) {
-      // If no initial data but profile selected, use profile's platform
-      const profile = activeProfiles.find(p => p.id === formData.profileId);
-      if (profile) {
-        setSelectedPlatforms([profile.platform]);
-        setCopies([{ platform: profile.platform, content: '', hashtags: [] }]);
+    if (initialData) {
+      // Handle multi-profile initialization
+      const profileIds = initialData.profile_ids && initialData.profile_ids.length > 0 
+        ? initialData.profile_ids 
+        : (initialData.profile_id ? [initialData.profile_id] : []);
+      
+      setSelectedProfileIds(profileIds);
+
+      if (initialData.copies && Array.isArray(initialData.copies)) {
+        setCopies(initialData.copies);
       }
     }
-  }, [initialData, formData.profileId, activeProfiles]);
+  }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (selectedProfileIds.length === 0) {
+      alert('Debes seleccionar al menos un perfil social');
+      return;
+    }
+
     const submitData = {
       product_id: formData.productId,
       post_date: formData.date.toISOString(),
-      profile_id: formData.profileId,
+      profile_ids: selectedProfileIds, // Multi-profile support
       content_type: formData.contentType,
       content_format: formData.contentFormat,
       hashtags: formData.hashtags,
@@ -89,12 +92,41 @@ export const PostForm = ({
       launch_id: formData.launchId || null
     };
 
-    console.log('Submitting post data:', submitData);
+    console.log('Submitting multi-profile post data:', submitData);
     onSubmit(submitData);
   };
 
+  const selectedProfilesCount = selectedProfileIds.length;
+  const selectedPlatforms = [...new Set(
+    activeProfiles
+      .filter(profile => selectedProfileIds.includes(profile.id))
+      .map(profile => profile.platform)
+  )];
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Header with selection summary */}
+      {selectedProfilesCount > 0 && (
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4 text-primary" />
+              <span className="font-medium">
+                Publicación multi-perfil: {selectedProfilesCount} perfil{selectedProfilesCount > 1 ? 'es' : ''} 
+                en {selectedPlatforms.length} plataforma{selectedPlatforms.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {selectedPlatforms.map(platform => (
+                <span key={platform} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                  {platform}
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
         <div className="space-y-4">
@@ -111,25 +143,6 @@ export const PostForm = ({
                 {products.map((product) => (
                   <SelectItem key={product.id} value={product.id}>
                     {product.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="profile">Perfil Social</Label>
-            <Select 
-              value={formData.profileId} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, profileId: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un perfil" />
-              </SelectTrigger>
-              <SelectContent>
-                {activeProfiles.map((profile) => (
-                  <SelectItem key={profile.id} value={profile.id}>
-                    {profile.name} ({profile.platform})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -202,19 +215,21 @@ export const PostForm = ({
           </div>
         </div>
 
-        {/* Platform Selection */}
+        {/* Multi-Profile Selection */}
         <div className="space-y-4">
-          <MultiPlatformSelector
-            selectedPlatforms={selectedPlatforms}
-            onChange={setSelectedPlatforms}
+          <MultiProfileSelector
+            profiles={activeProfiles}
+            selectedProfileIds={selectedProfileIds}
+            onChange={setSelectedProfileIds}
             disabled={isLoading}
           />
         </div>
       </div>
 
-      {/* Copies per Platform */}
-      <PlatformCopiesEditor
-        selectedPlatforms={selectedPlatforms}
+      {/* Multi-Profile Copies Editor */}
+      <MultiProfileCopiesEditor
+        selectedProfileIds={selectedProfileIds}
+        profiles={activeProfiles}
         copies={copies}
         onChange={setCopies}
       />
@@ -226,8 +241,17 @@ export const PostForm = ({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={isLoading || selectedPlatforms.length === 0}>
+        <Button 
+          type="submit" 
+          disabled={isLoading || selectedProfileIds.length === 0}
+          className="min-w-[120px]"
+        >
           {isLoading ? 'Guardando...' : initialData ? 'Actualizar' : 'Crear'} Publicación
+          {selectedProfilesCount > 1 && (
+            <span className="ml-1 text-xs opacity-75">
+              ({selectedProfilesCount})
+            </span>
+          )}
         </Button>
       </div>
     </form>

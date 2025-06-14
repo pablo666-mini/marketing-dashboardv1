@@ -33,17 +33,27 @@ const Calendar = () => {
   const { data: activeProfiles, isLoading: profilesLoading } = useActiveSocialProfiles();
   const { data: products, isLoading: productsLoading } = useProducts();
 
-  // Filter posts based on current filters
+  // Filter posts based on current filters with multi-profile support
   const filteredPosts = useMemo(() => {
     if (!posts) return [];
     return posts.filter(post => {
-      if (filters.profileId && post.profile_id !== filters.profileId) return false;
+      // Handle multi-profile filtering
+      if (filters.profileId) {
+        const hasProfile = post.profile_ids && post.profile_ids.includes(filters.profileId);
+        if (!hasProfile) return false;
+      }
+      
       if (filters.status && post.status !== filters.status) return false;
       if (filters.contentType && post.content_type !== filters.contentType) return false;
+      
       if (filters.platform) {
-        const profile = activeProfiles?.find(p => p.id === post.profile_id);
-        if (profile?.platform !== filters.platform) return false;
+        const postProfiles = activeProfiles?.filter(p => 
+          post.profile_ids && post.profile_ids.includes(p.id)
+        ) || [];
+        const hasPlatform = postProfiles.some(profile => profile.platform === filters.platform);
+        if (!hasPlatform) return false;
       }
+      
       return true;
     });
   }, [posts, filters, activeProfiles]);
@@ -62,9 +72,19 @@ const Calendar = () => {
     });
   };
 
-  const getProfileName = (profileId: string) => {
-    const profile = activeProfiles?.find(p => p.id === profileId);
-    return profile ? profile.name : 'Perfil no encontrado';
+  const getProfileNames = (profileIds: string[]) => {
+    if (!profileIds || profileIds.length === 0) return 'Sin perfiles';
+    
+    const postProfiles = activeProfiles?.filter(p => profileIds.includes(p.id)) || [];
+    if (postProfiles.length === 0) return 'Perfiles no encontrados';
+    
+    if (postProfiles.length === 1) {
+      return postProfiles[0].name;
+    }
+    
+    // For multiple profiles, show count and platforms
+    const platforms = [...new Set(postProfiles.map(p => p.platform))];
+    return `${postProfiles.length} perfiles (${platforms.join(', ')})`;
   };
 
   const getProductName = (productId: string) => {
@@ -92,7 +112,7 @@ const Calendar = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Calendario Editorial</h1>
           <p className="text-muted-foreground">
-            Planifica y visualiza el contenido programado para redes sociales
+            Planifica y visualiza el contenido programado para redes sociales (Multi-perfil)
           </p>
         </div>
       </div>
@@ -107,7 +127,11 @@ const Calendar = () => {
             setSelectedDate={setSelectedDate}
             filteredPosts={filteredPosts}
             getPostsForDay={getPostsForDay}
-            getProfileName={getProfileName}
+            getProfileName={(profileIds: string | string[]) => {
+              // Handle both single string (legacy) and array of strings (multi-profile)
+              const ids = Array.isArray(profileIds) ? profileIds : [profileIds];
+              return getProfileNames(ids);
+            }}
           />
         </div>
 
@@ -125,7 +149,10 @@ const Calendar = () => {
             <SelectedDateDetails
               selectedDate={selectedDate}
               selectedDatePosts={selectedDatePosts}
-              getProfileName={getProfileName}
+              getProfileName={(profileIds: string | string[]) => {
+                const ids = Array.isArray(profileIds) ? profileIds : [profileIds];
+                return getProfileNames(ids);
+              }}
               getProductName={getProductName}
             />
           )}

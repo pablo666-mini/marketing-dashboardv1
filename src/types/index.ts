@@ -19,18 +19,27 @@ export type LaunchCategory = 'Product Launch' | 'Campaign' | 'Update' | 'Other';
 export type LaunchStatus = 'Planned' | 'In Progress' | 'Completed' | 'Canceled';
 export type PhaseStatus = 'Not Started' | 'In Progress' | 'Completed' | 'Blocked';
 
-// Platform-specific copy content
+// Platform-specific copy content with optional profile specificity
 export interface PlatformCopy {
   platform: Platform;
   content: string;
   hashtags: string[];
+  profileId?: string; // Optional: for profile-specific copies
 }
 
-// Override SocialPost type to use proper types instead of Json
+// Multi-profile copy content structure
+export interface ProfileCopy {
+  profileId: string;
+  content: string;
+  hashtags: string[];
+}
+
+// Override SocialPost type to use proper types and support multi-profile
 import { SocialPost as SupabaseSocialPost } from './supabase';
 
-export interface SocialPost extends Omit<SupabaseSocialPost, 'copies'> {
+export interface SocialPost extends Omit<SupabaseSocialPost, 'copies' | 'profile_ids'> {
   copies: PlatformCopy[] | null;
+  profile_ids: string[]; // Multi-profile support
 }
 
 // Launch interface
@@ -120,22 +129,22 @@ export interface ApiResponse<T> {
   message: string;
 }
 
-// Form data for creating new posts
+// Multi-profile form data for creating new posts
 export interface CreatePostForm {
   productId: string;
   date: string;
-  profileId: string;
+  profileIds: string[]; // Changed from profileId to profileIds
   contentType: ContentType;
   contentFormat: ContentFormat;
   hashtags: string[];
   copies: PlatformCopy[];
 }
 
-// Form data for updating existing posts
+// Multi-profile form data for updating existing posts
 export interface UpdatePostForm {
   productId?: string;
   date?: string;
-  profileId?: string;
+  profileIds?: string[]; // Changed from profileId to profileIds
   contentType?: ContentType;
   contentFormat?: ContentFormat;
   hashtags?: string[];
@@ -170,11 +179,11 @@ export interface MediaKitResource {
   description?: string;
 }
 
-// Form data for creating/updating posts (UI layer)
+// Multi-profile form data for creating/updating posts (UI layer)
 export interface PostFormData {
   productId: string;
   postDate: string;
-  profileId: string;
+  profileIds: string[]; // Multi-profile support
   contentType: ContentType;
   contentFormat: string;
   copies: Record<string, string>;
@@ -188,4 +197,14 @@ export interface ProfileFormData {
   handle: string;
   platform: Platform;
   active: boolean;
+}
+
+// Multi-profile selection state
+export interface MultiProfileSelection {
+  [platform: string]: string[]; // platform -> profileIds
+}
+
+// Profile grouped by platform for UI
+export interface ProfilesByPlatform {
+  [platform: string]: SocialProfile[];
 }

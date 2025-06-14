@@ -15,13 +15,15 @@ export const useSocialProfiles = () => {
       const { data, error } = await supabase
         .from('social_profiles')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('platform', { ascending: true })
+        .order('name', { ascending: true });
 
       if (error) {
         console.error('Error fetching social profiles:', error);
         throw new Error(error.message);
       }
 
+      console.log('Fetched social profiles:', data);
       return data || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -37,13 +39,15 @@ export const useActiveSocialProfiles = () => {
         .from('social_profiles')
         .select('*')
         .eq('active', true)
-        .order('created_at', { ascending: false });
+        .order('platform', { ascending: true })
+        .order('name', { ascending: true });
 
       if (error) {
         console.error('Error fetching active social profiles:', error);
         throw new Error(error.message);
       }
 
+      console.log('Fetched active social profiles:', data);
       return data || [];
     },
     staleTime: 5 * 60 * 1000,
@@ -72,7 +76,12 @@ export const useCreateSocialProfile = () => {
     onSuccess: (newProfile) => {
       queryClient.setQueryData(QUERY_KEY, (old: SocialProfile[] | undefined) => {
         if (!old) return [newProfile];
-        return [newProfile, ...old];
+        return [...old, newProfile].sort((a, b) => {
+          if (a.platform !== b.platform) {
+            return a.platform.localeCompare(b.platform);
+          }
+          return a.name.localeCompare(b.name);
+        });
       });
 
       queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, 'active'] });
@@ -117,7 +126,12 @@ export const useUpdateSocialProfile = () => {
         if (!old) return [updatedProfile];
         return old.map(profile => 
           profile.id === updatedProfile.id ? updatedProfile : profile
-        );
+        ).sort((a, b) => {
+          if (a.platform !== b.platform) {
+            return a.platform.localeCompare(b.platform);
+          }
+          return a.name.localeCompare(b.name);
+        });
       });
 
       queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, 'active'] });

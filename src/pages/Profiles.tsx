@@ -1,15 +1,16 @@
 
 // Social Profiles management page
-import { useProfiles, useUpdateProfile } from '@/hooks/useApi';
+import { useSocialProfiles, useUpdateSocialProfile } from '@/hooks/useSocialProfiles';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Platform } from '@/types';
+import { Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const Profiles = () => {
-  const { data: profiles, isLoading } = useProfiles();
-  const updateProfile = useUpdateProfile();
+  const { data: profiles, isLoading } = useSocialProfiles();
+  const updateProfile = useUpdateSocialProfile();
 
   const handleToggleProfile = async (id: string, active: boolean) => {
     console.log(`Toggling profile ${id} to ${active ? 'active' : 'inactive'}`);
@@ -29,15 +30,14 @@ const Profiles = () => {
   };
 
   const getPlatformIcon = (platform: Platform) => {
-    // Using simple text icons for platforms
     switch (platform) {
-      case 'Instagram': return 'IG';
-      case 'TikTok': return 'TT';
-      case 'LinkedIn': return 'LI';
-      case 'X': return 'X';
-      case 'Pinterest': return 'PT';
-      case 'YouTube': return 'YT';
-      default: return '??';
+      case 'Instagram': return <Instagram className="h-4 w-4" />;
+      case 'TikTok': return <span className="text-xs font-bold">TT</span>;
+      case 'LinkedIn': return <Linkedin className="h-4 w-4" />;
+      case 'X': return <span className="text-xs font-bold">X</span>;
+      case 'Pinterest': return <span className="text-xs font-bold">PT</span>;
+      case 'YouTube': return <Youtube className="h-4 w-4" />;
+      default: return <span className="text-xs font-bold">??</span>;
     }
   };
 
@@ -57,25 +57,34 @@ const Profiles = () => {
   const activeCount = profiles?.filter(p => p.active).length || 0;
   const totalCount = profiles?.length || 0;
 
+  // Group profiles by platform for better organization
+  const profilesByPlatform = profiles?.reduce((acc, profile) => {
+    if (!acc[profile.platform]) {
+      acc[profile.platform] = [];
+    }
+    acc[profile.platform].push(profile);
+    return acc;
+  }, {} as Record<Platform, typeof profiles>) || {};
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Perfiles Sociales</h1>
         <p className="text-muted-foreground">
-          Gestiona las cuentas de redes sociales activas para campañas
+          Gestiona las cuentas oficiales de Miniland en redes sociales
         </p>
       </div>
 
       {/* Summary Card */}
       <Card>
         <CardHeader>
-          <CardTitle>Resumen de Perfiles</CardTitle>
+          <CardTitle>Resumen de Perfiles Oficiales</CardTitle>
           <CardDescription>
-            Estado actual de las cuentas de redes sociales
+            Estado actual de las cuentas oficiales de Miniland en redes sociales
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{activeCount}</div>
               <div className="text-sm text-muted-foreground">Activos</div>
@@ -88,73 +97,86 @@ const Profiles = () => {
               <div className="text-2xl font-bold text-foreground">{totalCount}</div>
               <div className="text-sm text-muted-foreground">Total</div>
             </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{Object.keys(profilesByPlatform).length}</div>
+              <div className="text-sm text-muted-foreground">Plataformas</div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Profiles Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {profiles?.map((profile) => (
-          <Card key={profile.id} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg ${getPlatformColor(profile.platform)} flex items-center justify-center text-white font-bold text-sm`}>
-                    {getPlatformIcon(profile.platform)}
+      {/* Profiles by Platform */}
+      {Object.entries(profilesByPlatform).map(([platform, platformProfiles]) => (
+        <Card key={platform}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-lg ${getPlatformColor(platform as Platform)} flex items-center justify-center text-white`}>
+                {getPlatformIcon(platform as Platform)}
+              </div>
+              {platform}
+              <Badge variant="outline" className="ml-auto">
+                {platformProfiles?.filter(p => p.active).length} de {platformProfiles?.length} activos
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {platformProfiles?.map((profile) => (
+                <div key={profile.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div>
+                        <h4 className="font-medium">{profile.name}</h4>
+                        <p className="text-sm text-muted-foreground">@{profile.handle}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={profile.active ? "default" : "secondary"}
+                        className={profile.active ? "bg-green-500 hover:bg-green-600" : ""}
+                      >
+                        {profile.active ? 'Activo' : 'Inactivo'}
+                      </Badge>
+                      {!profile.active && (
+                        <span className="text-xs text-orange-600">
+                          {profile.handle.includes('international') || profile.handle.includes('aus') ? 
+                            'En desuso' : 'Requiere reactivación'}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">{profile.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{profile.handle}</p>
-                  </div>
+                  <Switch
+                    checked={profile.active}
+                    onCheckedChange={(checked) => handleToggleProfile(profile.id, checked)}
+                    disabled={updateProfile.isPending}
+                  />
                 </div>
-                <Switch
-                  checked={profile.active}
-                  onCheckedChange={(checked) => handleToggleProfile(profile.id, checked)}
-                  disabled={updateProfile.isPending}
-                />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Badge 
-                  variant={profile.active ? "default" : "secondary"}
-                  className={profile.active ? "bg-green-500 hover:bg-green-600" : ""}
-                >
-                  {profile.active ? 'Activo' : 'Inactivo'}
-                </Badge>
-                <div className="text-sm text-muted-foreground">
-                  {profile.platform}
-                </div>
-              </div>
-              
-              <div className="mt-3 pt-3 border-t border-border">
-                <div className="text-xs text-muted-foreground">
-                  <p>Actualizado: {new Date(profile.updated_at).toLocaleDateString('es-ES')}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
 
-      {/* Active Profiles Info */}
+      {/* Active Profiles Summary for Content Creation */}
       {activeCount > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Perfiles Activos para Publicaciones</CardTitle>
             <CardDescription>
-              Estos perfiles estarán disponibles al crear nuevas publicaciones
+              Estos perfiles están disponibles para la creación de contenido y campañas
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {profiles?.filter(p => p.active).map((profile) => (
-                <div key={profile.id} className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg">
-                  <div className={`w-6 h-6 rounded ${getPlatformColor(profile.platform)} flex items-center justify-center text-white font-bold text-xs`}>
+                <div key={profile.id} className="flex items-center gap-3 bg-muted px-4 py-3 rounded-lg">
+                  <div className={`w-8 h-8 rounded ${getPlatformColor(profile.platform)} flex items-center justify-center text-white`}>
                     {getPlatformIcon(profile.platform)}
                   </div>
-                  <span className="text-sm font-medium">{profile.name}</span>
-                  <span className="text-xs text-muted-foreground">{profile.handle}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{profile.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">@{profile.handle}</div>
+                  </div>
                 </div>
               ))}
             </div>

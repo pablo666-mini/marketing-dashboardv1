@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Platform } from '@/types';
+import { Platform, SocialProfile } from '@/types';
 import { Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const Profiles = () => {
@@ -64,7 +64,7 @@ const Profiles = () => {
     }
     acc[profile.platform].push(profile);
     return acc;
-  }, {} as Record<Platform, typeof profiles>) || {};
+  }, {} as Record<Platform, SocialProfile[]>) || {};
 
   return (
     <div className="space-y-6">
@@ -115,13 +115,13 @@ const Profiles = () => {
               </div>
               {platform}
               <Badge variant="outline" className="ml-auto">
-                {platformProfiles?.filter(p => p.active).length} de {platformProfiles?.length} activos
+                {platformProfiles.filter(p => p.active).length} de {platformProfiles.length} activos
               </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {platformProfiles?.map((profile) => (
+              {platformProfiles.map((profile) => (
                 <div key={profile.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">

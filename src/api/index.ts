@@ -73,14 +73,15 @@ export const getPosts = async (): Promise<ApiResponse<SocialPost[]>> => {
 };
 
 export const createPost = async (postData: CreatePostForm): Promise<ApiResponse<SocialPost>> => {
-  console.log('API: Creating new post', postData);
+  console.log('API: Creating new multi-profile post', postData);
   await delay(800);
 
   const newPost: SocialPost = {
     id: Date.now().toString(),
     product_id: postData.productId,
     post_date: postData.date,
-    profile_id: postData.profileId,
+    profile_id: postData.profileIds[0] || null, // Legacy: use first profile as primary
+    profile_ids: postData.profileIds, // Multi-profile support
     content_type: postData.contentType,
     content_format: postData.contentFormat,
     copies: postData.copies,
@@ -97,7 +98,7 @@ export const createPost = async (postData: CreatePostForm): Promise<ApiResponse<
   return {
     data: newPost,
     success: true,
-    message: 'Publicación creada exitosamente'
+    message: 'Publicación multi-perfil creada exitosamente'
   };
 };
 
@@ -105,7 +106,7 @@ export const updatePost = async (
   id: string, 
   updates: UpdatePostForm
 ): Promise<ApiResponse<SocialPost>> => {
-  console.log(`API: Updating post ${id}`, updates);
+  console.log(`API: Updating multi-profile post ${id}`, updates);
   await delay(400);
 
   const postIndex = posts.findIndex(p => p.id === id);
@@ -121,7 +122,10 @@ export const updatePost = async (
     ...posts[postIndex],
     ...(updates.productId && { product_id: updates.productId }),
     ...(updates.date && { post_date: updates.date }),
-    ...(updates.profileId && { profile_id: updates.profileId }),
+    ...(updates.profileIds && { 
+      profile_ids: updates.profileIds,
+      profile_id: updates.profileIds[0] || null // Legacy: update primary profile
+    }),
     ...(updates.contentType && { content_type: updates.contentType }),
     ...(updates.contentFormat && { content_format: updates.contentFormat }),
     ...(updates.copies && { copies: updates.copies }),
@@ -133,7 +137,7 @@ export const updatePost = async (
   return {
     data: posts[postIndex],
     success: true,
-    message: 'Publicación actualizada exitosamente'
+    message: 'Publicación multi-perfil actualizada exitosamente'
   };
 };
 
@@ -197,7 +201,7 @@ export const getPostsByDateRange = async (
   startDate: string, 
   endDate: string
 ): Promise<ApiResponse<SocialPost[]>> => {
-  console.log(`API: Fetching posts from ${startDate} to ${endDate}`);
+  console.log(`API: Fetching multi-profile posts from ${startDate} to ${endDate}`);
   await delay(400);
   
   const filteredPosts = posts.filter(post => {
@@ -210,6 +214,6 @@ export const getPostsByDateRange = async (
   return {
     data: filteredPosts,
     success: true,
-    message: 'Publicaciones filtradas por fecha obtenidas exitosamente'
+    message: 'Publicaciones multi-perfil filtradas por fecha obtenidas exitosamente'
   };
 };

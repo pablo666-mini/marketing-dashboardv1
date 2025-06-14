@@ -34,12 +34,19 @@ export interface ProfileCopy {
   hashtags: string[];
 }
 
+// Import SocialProfile from Supabase types first
+import { SocialProfile as SupabaseSocialProfile } from './supabase';
+
+// Re-export SocialProfile for consistent imports
+export interface SocialProfile extends SupabaseSocialProfile {}
+
 // Override SocialPost type to use proper types and support multi-profile
 import { SocialPost as SupabaseSocialPost } from './supabase';
 
 export interface SocialPost extends Omit<SupabaseSocialPost, 'copies' | 'profile_ids'> {
   copies: PlatformCopy[] | null;
-  profile_ids: string[]; // Multi-profile support
+  profile_ids: string[]; // Multi-profile support - REQUIRED
+  profile_id?: string | null; // Legacy support - OPTIONAL
 }
 
 // Launch interface
@@ -133,7 +140,7 @@ export interface ApiResponse<T> {
 export interface CreatePostForm {
   productId: string;
   date: string;
-  profileIds: string[]; // Changed from profileId to profileIds
+  profileIds: string[]; // Multi-profile support
   contentType: ContentType;
   contentFormat: ContentFormat;
   hashtags: string[];
@@ -144,7 +151,7 @@ export interface CreatePostForm {
 export interface UpdatePostForm {
   productId?: string;
   date?: string;
-  profileIds?: string[]; // Changed from profileId to profileIds
+  profileIds?: string[]; // Multi-profile support
   contentType?: ContentType;
   contentFormat?: ContentFormat;
   hashtags?: string[];

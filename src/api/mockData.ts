@@ -102,13 +102,14 @@ export const mockProducts: Product[] = [
   }
 ];
 
-// Mock Posts
+// Mock Posts with multi-profile support
 export const mockPosts: SocialPost[] = [
   {
     id: '1',
     product_id: '1',
     post_date: '2024-06-15T10:00:00Z',
-    profile_id: '1',
+    profile_id: '1', // Legacy support
+    profile_ids: ['1'], // Multi-profile support
     content_type: 'Post',
     content_format: '1:1',
     media_resources_ids: ['1'],
@@ -129,7 +130,8 @@ export const mockPosts: SocialPost[] = [
     id: '2',
     product_id: '1',
     post_date: '2024-06-16T14:30:00Z',
-    profile_id: '2',
+    profile_id: '2', // Legacy support
+    profile_ids: ['2'], // Multi-profile support
     content_type: 'Reel',
     content_format: '9:16',
     media_resources_ids: ['2'],
@@ -150,7 +152,8 @@ export const mockPosts: SocialPost[] = [
     id: '3',
     product_id: '2',
     post_date: '2024-06-20T09:00:00Z',
-    profile_id: '3',
+    profile_id: '3', // Legacy support
+    profile_ids: ['3', '4'], // Multi-profile example: LinkedIn + X
     content_type: 'Post',
     content_format: '4:5',
     media_resources_ids: ['3'],
@@ -159,6 +162,11 @@ export const mockPosts: SocialPost[] = [
         platform: 'LinkedIn',
         content: 'En Miniland, creemos que la tecnología debe ser una herramienta para potenciar el aprendizaje.\n\nNuestra nueva línea Smart Toys combina innovación y educación para preparar a los niños para el futuro.\n\n#educacion #tecnologia #innovacion #miniland',
         hashtags: ['#educacion', '#tecnologia', '#innovacion', '#miniland']
+      },
+      {
+        platform: 'X',
+        content: '🚀 Smart Toys: el futuro del aprendizaje ya está aquí\n\nCombinamos tecnología e innovación para crear experiencias educativas únicas.\n\n#smarttoys #educacion #miniland',
+        hashtags: ['#smarttoys', '#educacion', '#miniland']
       }
     ],
     hashtags: ['#educacion', '#tecnologia', '#innovacion', '#miniland'],

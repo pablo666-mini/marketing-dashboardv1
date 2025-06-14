@@ -47,7 +47,7 @@ export const useProtocols = () => {
         throw new Error(error.message);
       }
 
-      return data || [];
+      return (data || []) as Protocol[];
     },
   });
 };
@@ -69,7 +69,7 @@ export const useCreateProtocol = () => {
         throw new Error(error.message);
       }
 
-      return data;
+      return data as Protocol;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
@@ -106,7 +106,7 @@ export const useUpdateProtocol = () => {
         throw new Error(error.message);
       }
 
-      return data;
+      return data as Protocol;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });

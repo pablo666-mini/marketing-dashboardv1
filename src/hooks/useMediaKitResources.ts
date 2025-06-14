@@ -56,7 +56,7 @@ export const useMediaKitResources = () => {
         throw new Error(error.message);
       }
 
-      return data || [];
+      return (data || []) as MediaKitResource[];
     },
   });
 };
@@ -78,13 +78,13 @@ export const useCreateMediaKitResource = () => {
         throw new Error(error.message);
       }
 
-      return data;
+      return data as MediaKitResource;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       toast({
         title: "Recurso creado",
-        description: "El recurso ha sido añadido al kit de medios exitosamente.",
+        description: "El recurso del kit de medios ha sido creado exitosamente.",
       });
     },
     onError: (error: Error) => {
@@ -115,13 +115,13 @@ export const useUpdateMediaKitResource = () => {
         throw new Error(error.message);
       }
 
-      return data;
+      return data as MediaKitResource;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       toast({
         title: "Recurso actualizado",
-        description: "El recurso ha sido actualizado exitosamente.",
+        description: "El recurso del kit de medios ha sido actualizado exitosamente.",
       });
     },
     onError: (error: Error) => {
@@ -154,7 +154,7 @@ export const useDeleteMediaKitResource = () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       toast({
         title: "Recurso eliminado",
-        description: "El recurso ha sido eliminado del kit de medios exitosamente.",
+        description: "El recurso del kit de medios ha sido eliminado exitosamente.",
       });
     },
     onError: (error: Error) => {

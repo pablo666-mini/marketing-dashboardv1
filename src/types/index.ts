@@ -1,4 +1,3 @@
-
 // Re-export Supabase types and add additional UI-specific types
 export * from './supabase';
 
@@ -40,13 +39,24 @@ import { SocialProfile as SupabaseSocialProfile } from './supabase';
 // Re-export SocialProfile for consistent imports
 export interface SocialProfile extends SupabaseSocialProfile {}
 
-// Override SocialPost type to use proper types and support multi-profile
+// Define SocialPost with proper multi-profile support
 import { SocialPost as SupabaseSocialPost } from './supabase';
 
-export interface SocialPost extends Omit<SupabaseSocialPost, 'copies' | 'profile_ids'> {
+export interface SocialPost {
+  id: string;
+  product_id: string | null;
+  post_date: string;
+  profile_id?: string | null;          // Legacy support - OPTIONAL
+  profile_ids: string[];               // Multi-profile support - REQUIRED
+  content_type: ContentType;
+  content_format: string | null;
   copies: PlatformCopy[] | null;
-  profile_ids: string[]; // Multi-profile support - REQUIRED
-  profile_id?: string | null; // Legacy support - OPTIONAL
+  hashtags: string[] | null;
+  status: PostStatus | null;
+  media_resources_ids: string[] | null;
+  launch_id: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 // Launch interface

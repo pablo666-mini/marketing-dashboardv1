@@ -215,6 +215,7 @@ export type Database = {
           post_date: string
           product_id: string | null
           profile_id: string | null
+          profile_ids: string[]
           status: Database["public"]["Enums"]["post_status"] | null
           updated_at: string | null
         }
@@ -230,6 +231,7 @@ export type Database = {
           post_date: string
           product_id?: string | null
           profile_id?: string | null
+          profile_ids?: string[]
           status?: Database["public"]["Enums"]["post_status"] | null
           updated_at?: string | null
         }
@@ -245,6 +247,7 @@ export type Database = {
           post_date?: string
           product_id?: string | null
           profile_id?: string | null
+          profile_ids?: string[]
           status?: Database["public"]["Enums"]["post_status"] | null
           updated_at?: string | null
         }

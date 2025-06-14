@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Platform, SocialProfile } from '@/types';
 import { Instagram, Linkedin, Youtube } from 'lucide-react';
+import { CreateProfileDialog } from '@/components/CreateProfileDialog';
 
 const Profiles = () => {
   const { data: profiles, isLoading } = useSocialProfiles();
@@ -68,11 +69,14 @@ const Profiles = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Perfiles Sociales</h1>
-        <p className="text-muted-foreground">
-          Gestiona las cuentas oficiales de Miniland en redes sociales
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Perfiles Sociales</h1>
+          <p className="text-muted-foreground">
+            Gestiona las cuentas oficiales de Miniland en redes sociales
+          </p>
+        </div>
+        <CreateProfileDialog />
       </div>
 
       {/* Summary Card */}

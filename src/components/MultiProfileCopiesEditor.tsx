@@ -76,6 +76,15 @@ export const MultiProfileCopiesEditor = ({
         hashtags
       };
       onChange(newCopies);
+    } else {
+      // Crear nueva copia si no existe
+      const newCopy: PlatformCopy = {
+        platform,
+        content: getCopyForPlatform(platform, profileId)?.content || '',
+        hashtags,
+        ...(profileId && { profileId })
+      };
+      onChange([...copies, newCopy]);
     }
   };
 
@@ -101,6 +110,7 @@ export const MultiProfileCopiesEditor = ({
   };
 
   const copyContent = (fromPlatform: Platform, toPlatform: Platform, fromProfileId?: string, toProfileId?: string) => {
+    console.log('Copying content from', fromPlatform, 'to', toPlatform);
     const sourceCopy = getCopyForPlatform(fromPlatform, fromProfileId);
     if (sourceCopy) {
       updateCopy(toPlatform, sourceCopy.content, toProfileId);
@@ -147,19 +157,26 @@ export const MultiProfileCopiesEditor = ({
                   <div className="flex gap-2">
                     {Object.keys(platformGroups)
                       .filter(p => p !== platform)
-                      .map(otherPlatform => (
-                        <Button
-                          key={otherPlatform}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyContent(otherPlatform as Platform, platformKey)}
-                          className="text-xs"
-                        >
-                          <Copy className="h-3 w-3 mr-1" />
-                          Copiar de {otherPlatform}
-                        </Button>
-                      ))}
+                      .map(otherPlatform => {
+                        const otherPlatformKey = otherPlatform as Platform;
+                        const sourceCopy = getCopyForPlatform(otherPlatformKey);
+                        const hasContent = sourceCopy && sourceCopy.content.trim() !== '';
+                        
+                        return (
+                          <Button
+                            key={otherPlatform}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => copyContent(otherPlatformKey, platformKey)}
+                            disabled={!hasContent}
+                            className="text-xs"
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            Copiar de {otherPlatform}
+                          </Button>
+                        );
+                      })}
                   </div>
                 )}
               </CardTitle>
@@ -175,25 +192,31 @@ export const MultiProfileCopiesEditor = ({
                     <div key={profile.id} className="border rounded-lg p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="font-medium text-sm">
-                          {profile.name} ({profile.handle})
+                          {profile.name} (@{profile.handle})
                         </div>
                         {platformProfiles.length > 1 && (
                           <div className="flex gap-1">
                             {platformProfiles
                               .filter(p => p.id !== profile.id)
-                              .map(otherProfile => (
-                                <Button
-                                  key={otherProfile.id}
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => copyContent(platformKey, platformKey, otherProfile.id, profile.id)}
-                                  className="text-xs"
-                                >
-                                  <Copy className="h-3 w-3 mr-1" />
-                                  {otherProfile.name}
-                                </Button>
-                              ))}
+                              .map(otherProfile => {
+                                const sourceCopy = getCopyForPlatform(platformKey, otherProfile.id);
+                                const hasContent = sourceCopy && sourceCopy.content.trim() !== '';
+                                
+                                return (
+                                  <Button
+                                    key={otherProfile.id}
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => copyContent(platformKey, platformKey, otherProfile.id, profile.id)}
+                                    disabled={!hasContent}
+                                    className="text-xs"
+                                  >
+                                    <Copy className="h-3 w-3 mr-1" />
+                                    {otherProfile.name}
+                                  </Button>
+                                );
+                              })}
                           </div>
                         )}
                       </div>
@@ -219,7 +242,7 @@ export const MultiProfileCopiesEditor = ({
                               ...prev, 
                               [hashtagKey]: e.target.value 
                             }))}
-                            onKeyPress={(e) => e.key === 'Enter' && addHashtag(platformKey, profile.id)}
+                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHashtag(platformKey, profile.id))}
                           />
                           <Button 
                             type="button" 
@@ -274,7 +297,7 @@ export const MultiProfileCopiesEditor = ({
                               ...prev, 
                               [hashtagKey]: e.target.value 
                             }))}
-                            onKeyPress={(e) => e.key === 'Enter' && addHashtag(platformKey)}
+                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHashtag(platformKey))}
                           />
                           <Button 
                             type="button" 

@@ -62,7 +62,9 @@ const Sidebar = () => {
                     variant={item.current ? "default" : "ghost"}
                     className={cn(
                       "w-full justify-start",
-                      item.current && "bg-muted font-medium"
+                      item.current 
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                        : "hover:bg-accent hover:text-accent-foreground"
                     )}
                   >
                     <item.icon className="mr-2 h-4 w-4" />

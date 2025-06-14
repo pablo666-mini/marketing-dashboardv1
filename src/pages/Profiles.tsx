@@ -1,3 +1,4 @@
+
 // Social Profiles management page
 import { useSocialProfiles, useUpdateSocialProfile } from '@/hooks/useSocialProfiles';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +18,7 @@ const Profiles = () => {
     updateProfile.mutate({ id, updates: { active } });
   };
 
-  const getPlatformColor = (platform: Platform) => {
+  const getPlatformColor = (platform: string) => {
     switch (platform) {
       case 'Instagram': return 'bg-gradient-to-r from-purple-500 to-pink-500';
       case 'TikTok': return 'bg-black';
@@ -29,7 +30,7 @@ const Profiles = () => {
     }
   };
 
-  const getPlatformIcon = (platform: Platform) => {
+  const getPlatformIcon = (platform: string) => {
     switch (platform) {
       case 'Instagram': return <Instagram className="h-4 w-4" />;
       case 'TikTok': return <span className="text-xs font-bold">TT</span>;
@@ -67,7 +68,7 @@ const Profiles = () => {
     }
     acc[profile.platform].push(profile);
     return acc;
-  }, {} as Record<Platform, SocialProfile[]>) || {};
+  }, {} as Record<string, SocialProfile[]>) || {};
 
   return (
     <div className="space-y-6">
@@ -118,8 +119,8 @@ const Profiles = () => {
           <Card key={platform}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-lg ${getPlatformColor(platform as Platform)} flex items-center justify-center text-white`}>
-                  {getPlatformIcon(platform as Platform)}
+                <div className={`w-8 h-8 rounded-lg ${getPlatformColor(platform)} flex items-center justify-center text-white`}>
+                  {getPlatformIcon(platform)}
                 </div>
                 {platform}
                 <Badge variant="outline" className="ml-auto">
@@ -190,7 +191,7 @@ const Profiles = () => {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </CardContent>
       )}
     </div>
   );

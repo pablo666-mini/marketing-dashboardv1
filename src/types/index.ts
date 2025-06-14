@@ -3,7 +3,7 @@
 export * from './supabase';
 
 // Platform enum - supported social media platforms (extensible)
-export type Platform = 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube' | string;
+export type Platform = 'Instagram' | 'TikTok' | 'LinkedIn' | 'X' | 'Pinterest' | 'YouTube' | 'Other';
 
 // Predefined platforms for UI consistency
 export const PREDEFINED_PLATFORMS: readonly Platform[] = [
@@ -224,6 +224,7 @@ export interface ProfileFormData {
   name: string;
   handle: string;
   platform: Platform;
+  customPlatformName?: string; // only when platform === "Other"
   active: boolean;
 }
 

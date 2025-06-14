@@ -7,45 +7,40 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus } from 'lucide-react';
-import { Platform, PREDEFINED_PLATFORMS } from '@/types';
+import { Platform, PREDEFINED_PLATFORMS, ProfileFormData } from '@/types';
 import { useCreateSocialProfile } from '@/hooks/useSocialProfiles';
 
 export const CreateProfileDialog = () => {
   const [open, setOpen] = useState(false);
-  const [showCustomPlatform, setShowCustomPlatform] = useState(false);
-  const [customPlatform, setCustomPlatform] = useState('');
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProfileFormData>({
     name: '',
     handle: '',
-    platform: '' as Platform,
+    platform: 'Instagram',
+    customPlatformName: '',
     active: true
   });
 
   const createProfile = useCreateSocialProfile();
 
-  const handlePlatformChange = (value: string) => {
-    if (value === 'custom') {
-      setShowCustomPlatform(true);
-      setCustomPlatform('');
-      setFormData(prev => ({ ...prev, platform: '' as Platform }));
-    } else {
-      setShowCustomPlatform(false);
-      setCustomPlatform('');
-      setFormData(prev => ({ ...prev, platform: value as Platform }));
-    }
+  const handlePlatformChange = (value: Platform) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      platform: value,
+      customPlatformName: value === 'Other' ? '' : undefined
+    }));
   };
 
   const handleCustomPlatformChange = (value: string) => {
-    setCustomPlatform(value);
-    // For custom platforms, we store the custom value directly as the platform
-    setFormData(prev => ({ ...prev, platform: value as Platform }));
+    setFormData(prev => ({ ...prev, customPlatformName: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Use custom platform if it's being used, otherwise use selected platform
-    const finalPlatform = showCustomPlatform ? customPlatform : formData.platform;
+    // Determine the final platform value for the database
+    const finalPlatform = formData.platform === 'Other' 
+      ? formData.customPlatformName || 'Other'
+      : formData.platform;
     
     if (!formData.name || !formData.handle || !finalPlatform) {
       return;
@@ -54,7 +49,7 @@ export const CreateProfileDialog = () => {
     createProfile.mutate({
       name: formData.name,
       handle: formData.handle,
-      platform: finalPlatform as Platform,
+      platform: finalPlatform,
       active: formData.active
     }, {
       onSuccess: () => {
@@ -62,17 +57,16 @@ export const CreateProfileDialog = () => {
         setFormData({
           name: '',
           handle: '',
-          platform: '' as Platform,
+          platform: 'Instagram',
+          customPlatformName: '',
           active: true
         });
-        setShowCustomPlatform(false);
-        setCustomPlatform('');
       }
     });
   };
 
   const isFormValid = formData.name && formData.handle && 
-    (showCustomPlatform ? customPlatform.trim() : formData.platform);
+    (formData.platform !== 'Other' || (formData.customPlatformName && formData.customPlatformName.trim()));
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -90,7 +84,7 @@ export const CreateProfileDialog = () => {
           <div>
             <Label htmlFor="platform">Plataforma</Label>
             <Select 
-              value={showCustomPlatform ? 'custom' : formData.platform} 
+              value={formData.platform} 
               onValueChange={handlePlatformChange}
             >
               <SelectTrigger>
@@ -102,17 +96,17 @@ export const CreateProfileDialog = () => {
                     {platform}
                   </SelectItem>
                 ))}
-                <SelectItem value="custom">
+                <SelectItem value="Other">
                   + Otra plataforma
                 </SelectItem>
               </SelectContent>
             </Select>
             
-            {showCustomPlatform && (
+            {formData.platform === 'Other' && (
               <div className="mt-2">
                 <Input
                   placeholder="Nombre de la plataforma"
-                  value={customPlatform}
+                  value={formData.customPlatformName || ''}
                   onChange={(e) => handleCustomPlatformChange(e.target.value)}
                   required
                 />

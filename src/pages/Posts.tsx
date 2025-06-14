@@ -1,6 +1,15 @@
+
 // Posts management page - create, edit, and manage social media posts
 import { useState } from 'react';
-import { usePosts, useActiveProfiles, useProducts, useCreatePost, useUpdatePost, useDeletePost } from '@/hooks/useApi';
+import { 
+  useSocialPosts as usePosts, 
+  useSocialPostsByDateRange as usePostsByDateRange,
+  useCreateSocialPost as useCreatePost, 
+  useUpdateSocialPost as useUpdatePost, 
+  useDeleteSocialPost as useDeletePost 
+} from '@/hooks/useSocialPosts';
+import { useSocialProfiles } from '@/hooks/useSocialProfiles';
+import { useProducts } from '@/hooks/useProducts';
 import { useLaunches } from '@/hooks/useLaunches';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +24,7 @@ import { SocialPost, PostStatus, ContentType } from '@/types';
 
 const Posts = () => {
   const { data: posts, isLoading: postsLoading } = usePosts();
-  const { data: activeProfiles, isLoading: profilesLoading } = useActiveProfiles();
+  const { data: profiles, isLoading: profilesLoading } = useSocialProfiles();
   const { data: products, isLoading: productsLoading } = useProducts();
   const { data: launches } = useLaunches();
   const createPost = useCreatePost();
@@ -27,6 +36,9 @@ const Posts = () => {
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<ContentType | 'all'>('all');
   const [launchFilter, setLaunchFilter] = useState<string | 'all'>('all');
+
+  // Get active profiles
+  const activeProfiles = profiles?.filter(p => p.active) || [];
 
   if (postsLoading || profilesLoading || productsLoading) {
     return (
@@ -87,7 +99,10 @@ const Posts = () => {
   const filteredPosts = posts?.filter(post => {
     if (statusFilter !== 'all' && post.status !== statusFilter) return false;
     if (typeFilter !== 'all' && post.content_type !== typeFilter) return false;
-    if (launchFilter !== 'all' && post.launch_id !== launchFilter) return false;
+    if (launchFilter !== 'all') {
+      if (launchFilter === 'none' && post.launch_id !== null) return false;
+      if (launchFilter !== 'none' && post.launch_id !== launchFilter) return false;
+    }
     return true;
   }) || [];
 
@@ -125,7 +140,7 @@ const Posts = () => {
               </DialogDescription>
             </DialogHeader>
             <PostForm
-              activeProfiles={activeProfiles || []}
+              activeProfiles={activeProfiles}
               products={products || []}
               onSubmit={handleCreatePost}
               onCancel={() => setShowCreateDialog(false)}
@@ -211,7 +226,7 @@ const Posts = () => {
         <CardContent>
           <PostTable
             posts={filteredPosts}
-            profiles={activeProfiles || []}
+            profiles={activeProfiles}
             products={products || []}
             launches={launches || []}
             onEdit={setEditingPost}
@@ -236,7 +251,7 @@ const Posts = () => {
           </DialogHeader>
           {editingPost && (
             <PostForm
-              activeProfiles={activeProfiles || []}
+              activeProfiles={activeProfiles}
               products={products || []}
               initialData={editingPost}
               onSubmit={handleUpdatePost}

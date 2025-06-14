@@ -1,11 +1,10 @@
-
 // General Information page - displays products, protocols, and media kit
 import { useGeneralInfo, useProducts } from '@/hooks/useApi';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ExternalLink, FileText, Image, Video, Megaphone } from 'lucide-react';
+import { ExternalLink, FileText, Image, Video, Megaphone, FolderOpen, Play } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const GeneralInfo = () => {
@@ -129,57 +128,96 @@ const GeneralInfo = () => {
         {/* Protocols Section */}
         <Card>
           <CardHeader>
-            <CardTitle>Protocolos de Comunicación</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Protocolos de Comunicación
+            </CardTitle>
             <CardDescription>
-              Guías y estándares para la creación de contenido
+              Guías y estándares para la gestión de contenido en redes sociales
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {generalInfo?.protocols?.map((protocol: any) => (
-              <div key={protocol.id} className="space-y-2">
-                <h4 className="font-medium">{protocol.title}</h4>
-                <p className="text-sm text-muted-foreground">{protocol.description}</p>
-                <div className="bg-muted p-3 rounded text-sm">
-                  <pre className="whitespace-pre-wrap font-mono">{protocol.content}</pre>
-                </div>
-                {protocol !== generalInfo.protocols[generalInfo.protocols.length - 1] && (
-                  <Separator className="mt-4" />
-                )}
+          <CardContent>
+            {Array.isArray(generalInfo?.protocols) && generalInfo.protocols.length > 0 ? (
+              <div className="space-y-4">
+                {generalInfo.protocols.map((protocol: any, index: number) => (
+                  <div key={protocol.id || index} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold">{protocol.title}</h3>
+                      <Badge variant="outline">{protocol.type}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {protocol.description}
+                    </p>
+                    <div className="bg-muted p-3 rounded text-sm whitespace-pre-wrap">
+                      {protocol.content}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No hay protocolos configurados</h3>
+                <p className="text-muted-foreground">
+                  Los protocolos se configuran desde el panel de administración
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Media Kit Section */}
         <Card>
           <CardHeader>
-            <CardTitle>Kit de Medios</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FolderOpen className="h-5 w-5" />
+              Kit de Medios
+            </CardTitle>
             <CardDescription>
-              Recursos multimedia y documentos corporativos
+              Recursos disponibles para campañas y comunicación
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {generalInfo?.media_kit?.map((resource: any) => (
-              <div key={resource.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  {getMediaIcon(resource.category)}
-                  <div>
-                    <h4 className="font-medium">{resource.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {getCategoryName(resource.category)}
-                    </p>
-                    {resource.description && (
-                      <p className="text-xs text-muted-foreground">{resource.description}</p>
-                    )}
+          <CardContent>
+            {Array.isArray(generalInfo?.media_kit) && generalInfo.media_kit.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {generalInfo.media_kit.map((resource: any, index: number) => (
+                  <div key={resource.id || index} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        {resource.category === 'press_convocation' && <FileText className="h-5 w-5 text-primary" />}
+                        {resource.category === 'press_note' && <FileText className="h-5 w-5 text-primary" />}
+                        {resource.category === 'banners' && <Image className="h-5 w-5 text-primary" />}
+                        {resource.category === 'photos' && <Image className="h-5 w-5 text-primary" />}
+                        {resource.category === 'videos' && <Play className="h-5 w-5 text-primary" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium truncate">{resource.name}</h3>
+                        <p className="text-sm text-muted-foreground capitalize">
+                          {resource.category.replace('_', ' ')}
+                        </p>
+                        {resource.description && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {resource.description}
+                          </p>
+                        )}
+                        <Button variant="ghost" size="sm" className="mt-2 h-8 px-2">
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Abrir
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <Button variant="ghost" size="sm" asChild>
-                  <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="text-center py-8">
+                <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No hay recursos disponibles</h3>
+                <p className="text-muted-foreground">
+                  Los recursos del kit de medios se configuran desde el panel de administración
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

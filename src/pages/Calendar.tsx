@@ -1,6 +1,5 @@
-
 import { useState, useMemo } from 'react';
-import { useSocialPosts } from '@/hooks/useSocialPosts';
+import { useSocialPostsByDateRange } from '@/hooks/useSocialPosts';
 import { useActiveSocialProfiles } from '@/hooks/useSocialProfiles';
 import { useProducts } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,7 +10,11 @@ import { CalendarGrid } from '@/components/CalendarGrid';
 import { SelectedDateDetails } from '@/components/SelectedDateDetails';
 
 const Calendar = () => {
-  const { data: posts, isLoading: postsLoading } = useSocialPosts();
+  const { data: posts = [], isLoading: postsLoading } = useSocialPostsByDateRange(
+    formatDateForAPI(startDate),
+    formatDateForAPI(endDate),
+    !!(startDate && endDate)
+  );
   const { data: activeProfiles, isLoading: profilesLoading } = useActiveSocialProfiles();
   const { data: products, isLoading: productsLoading } = useProducts();
 
@@ -41,7 +44,11 @@ const Calendar = () => {
   }, [selectedDate, filteredPosts]);
 
   const getPostsForDay = (day: Date) => {
-    return filteredPosts.filter(post => isSameDay(new Date(post.post_date), day));
+    const dayString = format(day, 'yyyy-MM-dd');
+    return posts.filter(post => {
+      const postDate = format(new Date(post.post_date), 'yyyy-MM-dd');
+      return postDate === dayString;
+    });
   };
 
   const getProfileName = (profileId: string) => {

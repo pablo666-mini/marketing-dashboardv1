@@ -1,3 +1,4 @@
+
 // General Information page - displays products, protocols, and media kit
 import { useProducts } from '@/hooks/useProducts';
 import { useProtocols } from '@/hooks/useProtocols';
@@ -6,18 +7,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ExternalLink, FileText, Image, Video, Megaphone, FolderOpen, Play, Plus, Package, Settings } from 'lucide-react';
+import { ExternalLink, FileText, Image, Video, Megaphone, FolderOpen, Play, Plus, Package, Settings, Edit } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import ProductForm from '@/components/ProductForm';
 import { ProtocolsManager } from '@/components/ProtocolsManager';
 import { MediaKitManager } from '@/components/MediaKitManager';
+import type { Product } from '@/types/supabase';
 
 const GeneralInfo = () => {
   const { data: products, isLoading: productsLoading } = useProducts();
   const { data: protocols, isLoading: protocolsLoading } = useProtocols();
   const { data: mediaResources, isLoading: mediaLoading } = useMediaKitResources();
   const [showCreateProductForm, setShowCreateProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   if (productsLoading || protocolsLoading || mediaLoading) {
     return (
@@ -60,6 +63,14 @@ const GeneralInfo = () => {
       case 'videos': return 'Videos';
       default: return category;
     }
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+  };
+
+  const handleCloseEditForm = () => {
+    setEditingProduct(null);
   };
 
   return (
@@ -106,13 +117,23 @@ const GeneralInfo = () => {
                     <div key={product.id} className="p-4 border border-border rounded-lg space-y-2">
                       <div className="flex items-start justify-between">
                         <h3 className="font-semibold text-base line-clamp-1">{product.name}</h3>
-                        {product.landing_url && (
-                          <Button variant="ghost" size="sm" asChild>
-                            <a href={product.landing_url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-3 w-3" />
-                            </a>
+                        <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleEditProduct(product)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-3 w-3" />
                           </Button>
-                        )}
+                          {product.landing_url && (
+                            <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
+                              <a href={product.landing_url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       {product.description && (
                         <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
@@ -292,14 +313,25 @@ const GeneralInfo = () => {
                           <p className="text-muted-foreground">{product.description}</p>
                         )}
                       </div>
-                      {product.landing_url && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={product.landing_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Ver Producto
-                          </a>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEditProduct(product)}
+                          className="gap-2"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Editar
                         </Button>
-                      )}
+                        {product.landing_url && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={product.landing_url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Ver Producto
+                            </a>
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     
                     {product.creative_concept && (
@@ -388,6 +420,15 @@ const GeneralInfo = () => {
         <ProductForm
           onClose={() => setShowCreateProductForm(false)}
           onSuccess={() => setShowCreateProductForm(false)}
+        />
+      )}
+
+      {/* Edit Product Form Modal */}
+      {editingProduct && (
+        <ProductForm
+          product={editingProduct}
+          onClose={handleCloseEditForm}
+          onSuccess={handleCloseEditForm}
         />
       )}
     </div>

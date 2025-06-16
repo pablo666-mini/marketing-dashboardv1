@@ -48,6 +48,10 @@ const GeneralInfo = () => {
     setShowCreateProductForm(true);
   };
 
+  const handleCloseCreateForm = () => {
+    setShowCreateProductForm(false);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -98,8 +102,8 @@ const GeneralInfo = () => {
       {/* Create Product Form Modal */}
       {showCreateProductForm && (
         <ProductForm
-          onClose={() => setShowCreateProductForm(false)}
-          onSuccess={() => setShowCreateProductForm(false)}
+          onClose={handleCloseCreateForm}
+          onSuccess={handleCloseCreateForm}
         />
       )}
 

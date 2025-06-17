@@ -1,3 +1,4 @@
+
 // Supabase-specific types that match our database schema
 export type Json =
   | string
@@ -277,29 +278,50 @@ export type Database = {
         Row: {
           active: boolean | null
           created_at: string | null
+          description: string | null
+          engagement_rate: number | null
+          followers_count: number | null
+          growth_rate: number | null
           handle: string
           id: string
+          last_updated: string | null
           name: string
+          notes: string | null
           platform: Database["public"]["Enums"]["platform_type"]
           updated_at: string | null
+          url: string | null
         }
         Insert: {
           active?: boolean | null
           created_at?: string | null
+          description?: string | null
+          engagement_rate?: number | null
+          followers_count?: number | null
+          growth_rate?: number | null
           handle: string
           id?: string
+          last_updated?: string | null
           name: string
+          notes?: string | null
           platform: Database["public"]["Enums"]["platform_type"]
           updated_at?: string | null
+          url?: string | null
         }
         Update: {
           active?: boolean | null
           created_at?: string | null
+          description?: string | null
+          engagement_rate?: number | null
+          followers_count?: number | null
+          growth_rate?: number | null
           handle?: string
           id?: string
+          last_updated?: string | null
           name?: string
+          notes?: string | null
           platform?: Database["public"]["Enums"]["platform_type"]
           updated_at?: string | null
+          url?: string | null
         }
         Relationships: []
       }

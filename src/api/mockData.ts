@@ -1,4 +1,3 @@
-
 // Mock data for the social media management dashboard
 import { 
   SocialProfile, 
@@ -16,57 +15,99 @@ import {
 export const mockProfiles: SocialProfile[] = [
   {
     id: '1',
-    name: 'Miniland España',
-    handle: '@miniland_es',
+    name: 'Empresa Principal',
+    handle: '@empresa_principal',
     platform: 'Instagram',
     active: true,
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
+    description: 'Perfil oficial de la empresa en Instagram',
+    url: 'https://instagram.com/empresa_principal',
+    followers_count: 15000,
+    growth_rate: 5.2,
+    engagement_rate: 3.8,
+    notes: 'Perfil principal con buen engagement',
+    last_updated: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
-    name: 'Miniland Official',
-    handle: '@minilandofficial',
+    name: 'TikTok Oficial',
+    handle: '@empresa_tiktok',
     platform: 'TikTok',
     active: true,
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
+    description: 'Contenido viral y entretenimiento',
+    url: 'https://tiktok.com/@empresa_tiktok',
+    followers_count: 8500,
+    growth_rate: 12.1,
+    engagement_rate: 7.2,
+    notes: 'Crecimiento rápido en audiencia joven',
+    last_updated: '2024-01-01T00:00:00Z'
   },
   {
     id: '3',
-    name: 'Miniland',
-    handle: '@miniland',
+    name: 'LinkedIn Corporativo',
+    handle: '@empresa-linkedin',
     platform: 'LinkedIn',
     active: false,
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
+    description: 'Perfil profesional y B2B',
+    url: 'https://linkedin.com/company/empresa',
+    followers_count: 3200,
+    growth_rate: 2.1,
+    engagement_rate: 4.5,
+    notes: 'Temporalmente inactivo',
+    last_updated: '2024-01-01T00:00:00Z'
   },
   {
     id: '4',
-    name: 'Miniland',
-    handle: '@miniland_oficial',
+    name: 'Twitter/X Empresa',
+    handle: '@empresa_x',
     platform: 'X',
     active: true,
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
+    description: 'Noticias y actualizaciones rápidas',
+    url: 'https://x.com/empresa_x',
+    followers_count: 5400,
+    growth_rate: 1.8,
+    engagement_rate: 2.9,
+    notes: 'Enfoque en noticias y comunicados',
+    last_updated: '2024-01-01T00:00:00Z'
   },
   {
     id: '5',
-    name: 'Miniland Toys',
-    handle: '@minilandtoys',
+    name: 'Pinterest Creativo',
+    handle: '@empresa_pinterest',
     platform: 'Pinterest',
     active: false,
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
+    description: 'Inspiración visual y productos',
+    url: 'https://pinterest.com/empresa_pinterest',
+    followers_count: 1200,
+    growth_rate: 0.5,
+    engagement_rate: 1.8,
+    notes: 'Bajo rendimiento, revisando estrategia',
+    last_updated: '2024-01-01T00:00:00Z'
   },
   {
     id: '6',
-    name: 'Miniland',
-    handle: '@MinilandChannel',
+    name: 'YouTube Canal',
+    handle: '@EmpresaYT',
     platform: 'YouTube',
     active: true,
     created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
+    updated_at: '2024-01-01T00:00:00Z',
+    description: 'Tutoriales y contenido educativo',
+    url: 'https://youtube.com/@EmpresaYT',
+    followers_count: 2800,
+    growth_rate: 8.7,
+    engagement_rate: 6.1,
+    notes: 'Excelente performance en videos educativos',
+    last_updated: '2024-01-01T00:00:00Z'
   }
 ];
 

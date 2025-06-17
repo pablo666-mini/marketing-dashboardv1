@@ -1,4 +1,3 @@
-
 // General Information page - displays products, protocols, and media kit
 import { useProducts } from '@/hooks/useProducts';
 import { useProtocols } from '@/hooks/useProtocols';
@@ -14,6 +13,7 @@ import { ProtocolsOverviewCard } from '@/components/ProtocolsOverviewCard';
 import { MediaKitOverviewCard } from '@/components/MediaKitOverviewCard';
 import { ProductsManagementTab } from '@/components/ProductsManagementTab';
 import type { Product } from '@/types/supabase';
+import LaunchTimeline from '@/components/LaunchTimeline';
 
 const GeneralInfo = () => {
   const { data: products, isLoading: productsLoading } = useProducts();
@@ -62,8 +62,9 @@ const GeneralInfo = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Resumen</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="protocols">Protocolos</TabsTrigger>
           <TabsTrigger value="media-kit">Kit de Medios</TabsTrigger>
           <TabsTrigger value="products">Productos</TabsTrigger>
@@ -80,6 +81,10 @@ const GeneralInfo = () => {
             <ProtocolsOverviewCard protocols={protocols} />
             <MediaKitOverviewCard mediaResources={mediaResources} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="timeline">
+          <LaunchTimeline />
         </TabsContent>
 
         <TabsContent value="protocols">

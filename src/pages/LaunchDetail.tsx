@@ -1,7 +1,7 @@
+
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLaunch, useUpdateLaunch, useDeleteLaunch } from '@/hooks/useLaunches';
-import { useLaunchPhases } from '@/hooks/useLaunchPhases';
 import { useProducts } from '@/hooks/useProducts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,26 +17,18 @@ import {
   Trash2, 
   Calendar, 
   User, 
-  Package, 
-  Plus,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle
+  Package,
+  Rocket
 } from 'lucide-react';
 import LaunchForm from '@/components/LaunchForm';
-import LaunchPhaseForm from '@/components/LaunchPhaseForm';
-import LaunchPhaseCard from '@/components/LaunchPhaseCard';
 import LaunchPosts from '@/components/LaunchPosts';
 
 const LaunchDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [showEditForm, setShowEditForm] = useState(false);
-  const [showCreatePhaseForm, setShowCreatePhaseForm] = useState(false);
 
   const { data: launch, isLoading } = useLaunch(id!);
-  const { data: phases, isLoading: phasesLoading } = useLaunchPhases(id!);
   const { data: products } = useProducts();
   const updateLaunch = useUpdateLaunch();
   const deleteLaunch = useDeleteLaunch();
@@ -73,18 +65,6 @@ const LaunchDetail = () => {
     }
   };
 
-  const getPhaseStats = () => {
-    if (!phases) return { total: 0, notStarted: 0, inProgress: 0, completed: 0, blocked: 0 };
-    
-    return {
-      total: phases.length,
-      notStarted: phases.filter(p => p.status === 'Not Started').length,
-      inProgress: phases.filter(p => p.status === 'In Progress').length,
-      completed: phases.filter(p => p.status === 'Completed').length,
-      blocked: phases.filter(p => p.status === 'Blocked').length,
-    };
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -114,7 +94,7 @@ const LaunchDetail = () => {
     );
   }
 
-  const phaseStats = getPhaseStats();
+  const campaignDuration = Math.ceil((new Date(launch.end_date).getTime() - new Date(launch.start_date).getTime()) / (1000 * 60 * 60 * 24));
 
   return (
     <div className="space-y-6">
@@ -130,9 +110,12 @@ const LaunchDetail = () => {
             Volver
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{launch.name}</h1>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Rocket className="h-8 w-8 text-blue-600" />
+              {launch.name}
+            </h1>
             <p className="text-muted-foreground">
-              Gestión detallada del lanzamiento
+              Gestión de campaña y contenido para redes sociales
             </p>
           </div>
         </div>
@@ -156,7 +139,6 @@ const LaunchDetail = () => {
         </div>
       </div>
 
-      {/* Launch Details */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Information */}
         <div className="lg:col-span-2 space-y-6">
@@ -200,10 +182,11 @@ const LaunchDetail = () => {
               
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Período:</span>
+                <span className="font-medium">Período de Campaña:</span>
                 <span>
                   {format(new Date(launch.start_date), 'dd/MM/yyyy', { locale: es })} - {' '}
                   {format(new Date(launch.end_date), 'dd/MM/yyyy', { locale: es })}
+                  <span className="text-muted-foreground ml-2">({campaignDuration} días)</span>
                 </span>
               </div>
 
@@ -211,10 +194,52 @@ const LaunchDetail = () => {
                 <>
                   <Separator />
                   <div>
-                    <h4 className="font-medium mb-2">Descripción</h4>
+                    <h4 className="font-medium mb-2">Información de Contexto</h4>
                     <CardDescription className="whitespace-pre-wrap">
                       {launch.description}
                     </CardDescription>
+                  </div>
+                </>
+              )}
+
+              {product && (
+                <>
+                  <Separator />
+                  <div>
+                    <h4 className="font-medium mb-2">Información del Producto</h4>
+                    <div className="space-y-2 text-sm">
+                      {product.description && (
+                        <div>
+                          <span className="font-medium">Descripción:</span>
+                          <p className="text-muted-foreground mt-1">{product.description}</p>
+                        </div>
+                      )}
+                      {product.hashtags && product.hashtags.length > 0 && (
+                        <div>
+                          <span className="font-medium">Hashtags sugeridos:</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {product.hashtags.map((hashtag, index) => (
+                              <span key={index} className="text-xs bg-muted px-2 py-1 rounded">
+                                #{hashtag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {product.landing_url && (
+                        <div>
+                          <span className="font-medium">Landing URL:</span>
+                          <a 
+                            href={product.landing_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline ml-2"
+                          >
+                            {product.landing_url}
+                          </a>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
@@ -223,89 +248,46 @@ const LaunchDetail = () => {
 
           {/* Social Posts Section */}
           <LaunchPosts launchId={launch.id} launchName={launch.name} />
-
-          {/* Phases Section */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Fases del Lanzamiento ({phaseStats.total})
-                </CardTitle>
-                <Button
-                  size="sm"
-                  onClick={() => setShowCreatePhaseForm(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nueva Fase
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {phasesLoading ? (
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-24" />
-                  ))}
-                </div>
-              ) : phases && phases.length > 0 ? (
-                <div className="space-y-4">
-                  {phases.map((phase) => (
-                    <LaunchPhaseCard key={phase.id} phase={phase} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No hay fases definidas</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Comienza agregando las fases de este lanzamiento
-                  </p>
-                  <Button onClick={() => setShowCreatePhaseForm(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Crear Primera Fase
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Sidebar */}
+        {/* Sidebar - Campaign Info */}
         <div className="space-y-6">
-          {/* Phase Statistics */}
+          {/* Campaign Summary */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Resumen de Fases</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Resumen de Campaña
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                  <span className="text-sm">Sin Comenzar</span>
-                </div>
-                <span className="font-medium">{phaseStats.notStarted}</span>
+            <CardContent className="space-y-4">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">{campaignDuration}</div>
+                <div className="text-sm text-blue-800">días de campaña</div>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <span className="text-sm">En Progreso</span>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Inicio:</span>
+                  <span className="font-medium">
+                    {format(new Date(launch.start_date), 'dd/MM/yyyy', { locale: es })}
+                  </span>
                 </div>
-                <span className="font-medium">{phaseStats.inProgress}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <span className="text-sm">Completadas</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Fin:</span>
+                  <span className="font-medium">
+                    {format(new Date(launch.end_date), 'dd/MM/yyyy', { locale: es })}
+                  </span>
                 </div>
-                <span className="font-medium">{phaseStats.completed}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <span className="text-sm">Bloqueadas</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Estado:</span>
+                  <Badge variant="outline" className={getStatusColor(launch.status)}>
+                    {launch.status === 'Planned' && 'Planificado'}
+                    {launch.status === 'In Progress' && 'En Progreso'}
+                    {launch.status === 'Completed' && 'Completado'}
+                    {launch.status === 'Canceled' && 'Cancelado'}
+                  </Badge>
                 </div>
-                <span className="font-medium">{phaseStats.blocked}</span>
               </div>
             </CardContent>
           </Card>
@@ -329,10 +311,8 @@ const LaunchDetail = () => {
                 </div>
               </div>
               <div>
-                <span className="text-muted-foreground">Duración:</span>
-                <div className="font-medium">
-                  {Math.ceil((new Date(launch.end_date).getTime() - new Date(launch.start_date).getTime()) / (1000 * 60 * 60 * 24))} días
-                </div>
+                <span className="text-muted-foreground">Responsable:</span>
+                <div className="font-medium">{launch.responsible}</div>
               </div>
             </CardContent>
           </Card>
@@ -345,15 +325,6 @@ const LaunchDetail = () => {
           launch={launch}
           onClose={() => setShowEditForm(false)}
           onSuccess={() => setShowEditForm(false)}
-        />
-      )}
-
-      {/* Create Phase Form Modal */}
-      {showCreatePhaseForm && (
-        <LaunchPhaseForm
-          launchId={launch.id}
-          onClose={() => setShowCreatePhaseForm(false)}
-          onSuccess={() => setShowCreatePhaseForm(false)}
         />
       )}
     </div>

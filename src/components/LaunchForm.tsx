@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useProducts } from '@/hooks/useProducts';
 import { useCreateLaunch, useUpdateLaunch } from '@/hooks/useLaunches';
@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Launch, CreateLaunchInput, UpdateLaunchInput, LaunchCategory, LaunchStatus } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Rocket, Package, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LaunchFormProps {
@@ -53,7 +53,7 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
     defaultValues: {
       name: launch?.name || '',
       product_id: launch?.product_id || 'none',
-      category: launch?.category || 'Other',
+      category: launch?.category || 'Campaign',
       status: launch?.status || 'Planned',
       start_date: launch ? new Date(launch.start_date) : undefined,
       end_date: launch ? new Date(launch.end_date) : undefined,
@@ -95,25 +95,29 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Rocket className="h-5 w-5 text-blue-600" />
             {isEditing ? 'Editar Lanzamiento' : 'Crear Nuevo Lanzamiento'}
           </DialogTitle>
           <DialogDescription>
             {isEditing 
-              ? 'Modifica los detalles del lanzamiento'
-              : 'Completa los detalles para crear un nuevo lanzamiento'
+              ? 'Modifica la información básica del lanzamiento para organizar tu campaña de redes sociales'
+              : 'Define la información básica para organizar tu campaña de redes sociales'
             }
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Name */}
+          {/* Campaign Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Nombre del Lanzamiento *</Label>
+            <Label htmlFor="name" className="flex items-center gap-2">
+              <Rocket className="h-4 w-4" />
+              Nombre de la Campaña *
+            </Label>
             <Input
               id="name"
               {...register('name', { required: 'El nombre es requerido' })}
-              placeholder="Ej: Lanzamiento Baby Walker Q3"
+              placeholder="Ej: Lanzamiento Baby Walker Q3, Campaña Navidad 2025"
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -122,7 +126,10 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
 
           {/* Product Selection */}
           <div className="space-y-2">
-            <Label htmlFor="product">Producto</Label>
+            <Label htmlFor="product" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Producto (Opcional)
+            </Label>
             <Select
               value={watch('product_id')}
               onValueChange={(value) => setValue('product_id', value)}
@@ -139,12 +146,15 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
                 ))}
               </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground">
+              Conecta la campaña con un producto específico para acceso rápido a su información
+            </p>
           </div>
 
           {/* Category and Status */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="category">Categoría *</Label>
+              <Label htmlFor="category">Tipo de Campaña *</Label>
               <Select
                 value={watch('category')}
                 onValueChange={(value: LaunchCategory) => setValue('category', value)}
@@ -154,15 +164,15 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Product Launch">Lanzamiento de Producto</SelectItem>
-                  <SelectItem value="Campaign">Campaña</SelectItem>
-                  <SelectItem value="Update">Actualización</SelectItem>
+                  <SelectItem value="Campaign">Campaña de Marketing</SelectItem>
+                  <SelectItem value="Update">Actualización/Comunicado</SelectItem>
                   <SelectItem value="Other">Otro</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status">Estado *</Label>
+              <Label htmlFor="status">Estado Actual *</Label>
               <Select
                 value={watch('status')}
                 onValueChange={(value: LaunchStatus) => setValue('status', value)}
@@ -180,100 +190,115 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
             </div>
           </div>
 
-          {/* Dates */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Fecha de Inicio *</Label>
-              <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !startDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? (
-                      format(startDate, 'dd/MM/yyyy', { locale: es })
-                    ) : (
-                      <span>Seleccionar fecha</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(date) => {
-                      setValue('start_date', date);
-                      setStartDateOpen(false);
-                    }}
-                    locale={es}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+          {/* Campaign Duration */}
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4" />
+              Duración de la Campaña *
+            </Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Fecha de Inicio</Label>
+                <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? (
+                        format(startDate, 'dd/MM/yyyy', { locale: es })
+                      ) : (
+                        <span>Seleccionar</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={(date) => {
+                        setValue('start_date', date);
+                        setStartDateOpen(false);
+                      }}
+                      locale={es}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-            <div className="space-y-2">
-              <Label>Fecha de Fin *</Label>
-              <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !endDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? (
-                      format(endDate, 'dd/MM/yyyy', { locale: es })
-                    ) : (
-                      <span>Seleccionar fecha</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={(date) => {
-                      setValue('end_date', date);
-                      setEndDateOpen(false);
-                    }}
-                    locale={es}
-                    disabled={(date) => startDate ? date <= startDate : false}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Fecha de Fin</Label>
+                <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !endDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? (
+                        format(endDate, 'dd/MM/yyyy', { locale: es })
+                      ) : (
+                        <span>Seleccionar</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={(date) => {
+                        setValue('end_date', date);
+                        setEndDateOpen(false);
+                      }}
+                      locale={es}
+                      disabled={(date) => startDate ? date <= startDate : false}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Define el período en el que estará activa la campaña de redes sociales
+            </p>
           </div>
 
           {/* Responsible */}
           <div className="space-y-2">
-            <Label htmlFor="responsible">Responsable *</Label>
+            <Label htmlFor="responsible" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Responsable de la Campaña *
+            </Label>
             <Input
               id="responsible"
               {...register('responsible', { required: 'El responsable es requerido' })}
-              placeholder="Ej: María González"
+              placeholder="Ej: María González, Equipo de Marketing"
             />
             {errors.responsible && (
               <p className="text-sm text-destructive">{errors.responsible.message}</p>
             )}
           </div>
 
-          {/* Description */}
+          {/* Context Information */}
           <div className="space-y-2">
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="description">Información de Contexto</Label>
             <Textarea
               id="description"
               {...register('description')}
-              placeholder="Describe los objetivos y detalles del lanzamiento..."
+              placeholder="Describe los objetivos, público objetivo, mensajes clave, o cualquier información relevante para el equipo de redes sociales..."
               rows={4}
             />
+            <p className="text-xs text-muted-foreground">
+              Información útil para la creación de contenido y gestión de la campaña
+            </p>
           </div>
 
           {/* Actions */}
@@ -285,7 +310,7 @@ const LaunchForm = ({ launch, onClose, onSuccess }: LaunchFormProps) => {
               type="submit" 
               disabled={!isValid || isLoading}
             >
-              {isLoading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear Lanzamiento')}
+              {isLoading ? 'Guardando...' : (isEditing ? 'Actualizar Campaña' : 'Crear Campaña')}
             </Button>
           </div>
         </form>

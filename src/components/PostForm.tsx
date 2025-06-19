@@ -55,7 +55,7 @@ export const PostForm = ({
     contentType: initialData?.content_type || 'Post' as ContentType,
     contentFormat: initialData?.content_format || '1:1' as ContentFormat,
     hashtags: initialData?.hashtags || [],
-    launchId: initialData?.launch_id || defaultLaunchId || ''
+    launchId: initialData?.launch_id || defaultLaunchId || 'none'
   });
 
   const [selectedProfileIds, setSelectedProfileIds] = useState<string[]>([]);
@@ -93,7 +93,7 @@ export const PostForm = ({
       content_format: formData.contentFormat,
       hashtags: formData.hashtags,
       copies: copies.length > 0 ? copies : [],
-      launch_id: formData.launchId || null
+      launch_id: formData.launchId === 'none' ? null : formData.launchId
     };
 
     console.log('Submitting multi-profile post data with launch:', submitData);
@@ -112,7 +112,7 @@ export const PostForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Launch Connection - Prominent Display */}
-      {formData.launchId && selectedLaunch && (
+      {formData.launchId !== 'none' && selectedLaunch && (
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-sm">
@@ -163,7 +163,7 @@ export const PostForm = ({
                 <SelectValue placeholder="Selecciona un lanzamiento" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Sin lanzamiento</SelectItem>
+                <SelectItem value="none">Sin lanzamiento</SelectItem>
                 {launches.map((launch) => (
                   <SelectItem key={launch.id} value={launch.id}>
                     <div className="flex items-center gap-2">

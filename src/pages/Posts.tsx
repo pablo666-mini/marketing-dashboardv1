@@ -16,8 +16,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Eye, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Filter, Rocket, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PostForm } from '@/components/PostForm';
 import { PostTable } from '@/components/PostTable';
 import { SocialPost, PostStatus, ContentType } from '@/types';
@@ -106,13 +107,15 @@ const Posts = () => {
     return true;
   }) || [];
 
-  // Stats
+  // Enhanced stats including launch connections
   const stats = {
     total: posts?.length || 0,
     pending: posts?.filter(p => p.status === 'Pending').length || 0,
     approved: posts?.filter(p => p.status === 'Approved').length || 0,
     published: posts?.filter(p => p.status === 'Published').length || 0,
-    canceled: posts?.filter(p => p.status === 'Canceled').length || 0
+    canceled: posts?.filter(p => p.status === 'Canceled').length || 0,
+    withLaunch: posts?.filter(p => p.launch_id).length || 0,
+    withoutLaunch: posts?.filter(p => !p.launch_id).length || 0
   };
 
   return (
@@ -121,7 +124,7 @@ const Posts = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Publicaciones</h1>
           <p className="text-muted-foreground">
-            Gestiona el contenido para redes sociales
+            Gestiona el contenido para redes sociales y sus conexiones con lanzamientos
           </p>
         </div>
         
@@ -150,8 +153,19 @@ const Posts = () => {
         </Dialog>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      {/* Launch Connection Alert */}
+      {stats.withoutLaunch > 0 && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Tienes {stats.withoutLaunch} publicación{stats.withoutLaunch > 1 ? 'es' : ''} sin conectar a ningún lanzamiento. 
+            Considera vincularlas para una mejor organización.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Enhanced Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="text-center">
@@ -192,6 +206,22 @@ const Posts = () => {
             </div>
           </CardContent>
         </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.withLaunch}</div>
+              <div className="text-sm text-muted-foreground">Con Lanzamiento</div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-600">{stats.withoutLaunch}</div>
+              <div className="text-sm text-muted-foreground">Sin Lanzamiento</div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Posts Table */}
@@ -201,7 +231,7 @@ const Posts = () => {
             <div>
               <CardTitle>Lista de Publicaciones</CardTitle>
               <CardDescription>
-                Gestiona y organiza todas las publicaciones programadas
+                Gestiona y organiza todas las publicaciones programadas y sus conexiones con lanzamientos
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -212,10 +242,18 @@ const Posts = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos los lanzamientos</SelectItem>
-                  <SelectItem value="none">Sin lanzamiento</SelectItem>
+                  <SelectItem value="none">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-3 w-3" />
+                      Sin lanzamiento
+                    </div>
+                  </SelectItem>
                   {launches?.map((launch) => (
                     <SelectItem key={launch.id} value={launch.id}>
-                      {launch.name}
+                      <div className="flex items-center gap-2">
+                        <Rocket className="h-3 w-3" />
+                        {launch.name}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -246,7 +284,7 @@ const Posts = () => {
           <DialogHeader>
             <DialogTitle>Editar Publicación</DialogTitle>
             <DialogDescription>
-              Modifica la información de la publicación
+              Modifica la información de la publicación y su conexión con lanzamientos
             </DialogDescription>
           </DialogHeader>
           {editingPost && (

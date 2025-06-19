@@ -8,18 +8,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Users } from 'lucide-react';
+import { CalendarIcon, Users, Rocket } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { 
   SocialProfile, 
   Product, 
-  SocialPost, 
+  SocialPost,
+  Launch,
   ContentType, 
   ContentFormat, 
   PlatformCopy 
 } from '@/types';
+import { useLaunches } from '@/hooks/useLaunches';
 import { MultiProfileSelector } from '@/components/MultiProfileSelector';
 import { MultiProfileCopiesEditor } from '@/components/MultiProfileCopiesEditor';
 
@@ -45,6 +47,8 @@ export const PostForm = ({
   isLoading,
   defaultLaunchId
 }: PostFormProps) => {
+  const { data: launches = [] } = useLaunches();
+  
   const [formData, setFormData] = useState({
     productId: initialData?.product_id || '',
     date: initialData ? new Date(initialData.post_date) : new Date(),
@@ -84,7 +88,7 @@ export const PostForm = ({
     const submitData = {
       product_id: formData.productId,
       post_date: formData.date.toISOString(),
-      profile_ids: selectedProfileIds, // Multi-profile support
+      profile_ids: selectedProfileIds,
       content_type: formData.contentType,
       content_format: formData.contentFormat,
       hashtags: formData.hashtags,
@@ -92,7 +96,7 @@ export const PostForm = ({
       launch_id: formData.launchId || null
     };
 
-    console.log('Submitting multi-profile post data:', submitData);
+    console.log('Submitting multi-profile post data with launch:', submitData);
     onSubmit(submitData);
   };
 
@@ -103,8 +107,27 @@ export const PostForm = ({
       .map(profile => profile.platform)
   )];
 
+  const selectedLaunch = launches.find(launch => launch.id === formData.launchId);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Launch Connection - Prominent Display */}
+      {formData.launchId && selectedLaunch && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-sm">
+              <Rocket className="h-4 w-4 text-blue-600" />
+              <span className="font-medium text-blue-800">
+                Conectado al lanzamiento: {selectedLaunch.name}
+              </span>
+            </div>
+            <div className="mt-2 text-xs text-blue-600">
+              {format(new Date(selectedLaunch.start_date), 'dd/MM/yyyy', { locale: es })} - {format(new Date(selectedLaunch.end_date), 'dd/MM/yyyy', { locale: es })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header with selection summary */}
       {selectedProfilesCount > 0 && (
         <Card className="bg-primary/5 border-primary/20">
@@ -130,6 +153,29 @@ export const PostForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
         <div className="space-y-4">
+          <div>
+            <Label htmlFor="launch">Lanzamiento (Opcional)</Label>
+            <Select 
+              value={formData.launchId} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, launchId: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona un lanzamiento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Sin lanzamiento</SelectItem>
+                {launches.map((launch) => (
+                  <SelectItem key={launch.id} value={launch.id}>
+                    <div className="flex items-center gap-2">
+                      <Rocket className="h-3 w-3" />
+                      {launch.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div>
             <Label htmlFor="product">Producto</Label>
             <Select 

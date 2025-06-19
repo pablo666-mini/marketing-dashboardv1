@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Edit, Trash2, Calendar, Users } from 'lucide-react';
+import { Edit, Trash2, Calendar, Users, Rocket, Package } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { 
@@ -92,14 +92,38 @@ export const PostTable = ({
     return product ? product.name : 'Producto no encontrado';
   };
 
-  const getLaunchName = (launchId: string | null) => {
+  const getLaunchInfo = (launchId: string | null) => {
     if (!launchId) return null;
     const launch = launches.find(l => l.id === launchId);
-    return launch ? launch.name : 'Lanzamiento no encontrado';
+    return launch;
+  };
+
+  // Calculate launch connection stats
+  const launchStats = {
+    connected: posts.filter(p => p.launch_id).length,
+    unconnected: posts.filter(p => !p.launch_id).length
   };
 
   return (
     <div className="space-y-4">
+      {/* Launch Connection Summary */}
+      {(launchStats.connected > 0 || launchStats.unconnected > 0) && (
+        <div className="flex items-center gap-4 p-3 bg-muted rounded-lg">
+          <div className="flex items-center gap-2">
+            <Rocket className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium">Conexiones de lanzamiento:</span>
+          </div>
+          <Badge variant="outline" className="bg-blue-50">
+            {launchStats.connected} conectadas
+          </Badge>
+          {launchStats.unconnected > 0 && (
+            <Badge variant="outline" className="bg-yellow-50">
+              {launchStats.unconnected} sin conectar
+            </Badge>
+          )}
+        </div>
+      )}
+
       {/* Filters */}
       <div className="flex gap-4">
         <div className="w-48">
@@ -143,7 +167,6 @@ export const PostTable = ({
               <TableHead>Producto</TableHead>
               <TableHead>Perfiles</TableHead>
               <TableHead>Tipo</TableHead>
-              <TableHead>Formato</TableHead>
               <TableHead>Lanzamiento</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Acciones</TableHead>
@@ -152,7 +175,7 @@ export const PostTable = ({
           <TableBody>
             {posts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   No hay publicaciones que coincidan con los filtros seleccionados
                 </TableCell>
               </TableRow>
@@ -160,6 +183,7 @@ export const PostTable = ({
               posts.map((post) => {
                 const profilesData = getProfileNames(post.profile_ids);
                 const isMultiProfile = post.profile_ids.length > 1;
+                const launchInfo = getLaunchInfo(post.launch_id);
                 
                 return (
                   <TableRow key={post.id}>
@@ -178,7 +202,10 @@ export const PostTable = ({
                     </TableCell>
                     
                     <TableCell>
-                      <div className="font-medium">{getProductName(post.product_id || '')}</div>
+                      <div className="flex items-center gap-2">
+                        <Package className="h-4 w-4 text-muted-foreground" />
+                        <div className="font-medium">{getProductName(post.product_id || '')}</div>
+                      </div>
                     </TableCell>
                     
                     <TableCell className="max-w-xs">
@@ -217,17 +244,27 @@ export const PostTable = ({
                     <TableCell>
                       <Badge variant="outline">{post.content_type}</Badge>
                     </TableCell>
-                    
-                    <TableCell>
-                      <Badge variant="secondary">{post.content_format}</Badge>
-                    </TableCell>
 
                     <TableCell>
-                      {post.launch_id && (
-                        <Badge variant="outline" className="text-xs">
-                          {getLaunchName(post.launch_id)}
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {launchInfo ? (
+                          <>
+                            <Rocket className="h-3 w-3 text-blue-600" />
+                            <div>
+                              <Badge variant="outline" className="text-xs bg-blue-50">
+                                {launchInfo.name}
+                              </Badge>
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {launchInfo.status}
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <Badge variant="secondary" className="text-xs">
+                            Sin lanzamiento
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     
                     <TableCell>

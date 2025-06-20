@@ -21,10 +21,9 @@ import {
   GanttHeader, 
   GanttFeatureListGroup, 
   GanttFeatureItem, 
-  GanttToday,
-  type GanttFeature
+  GanttToday 
 } from '@/components/ui/gantt';
-import type { Product } from '@/types';
+import type { Product, GanttFeature } from '@/types';
 import LaunchTimeline from '@/components/LaunchTimeline';
 
 const GeneralInfo = () => {

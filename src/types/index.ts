@@ -237,3 +237,25 @@ export interface MultiProfileSelection {
 export interface ProfilesByPlatform {
   [platform: string]: SocialProfile[];
 }
+
+// Gantt Timeline specific types
+export interface PostItem {
+  id: string;
+  postDate: string;
+  profileIds: string[];
+}
+
+export interface LaunchWithPosts {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: { id: string; name: string; color: string };
+  posts: PostItem[];
+}
+
+export interface TimelineStatus {
+  id: string;
+  name: string;
+  color: string;
+}

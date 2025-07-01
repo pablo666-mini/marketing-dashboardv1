@@ -29,7 +29,17 @@ export const useScheduledPosts = (profileId?: string) => {
         throw new Error(error.message);
       }
 
-      return data || [];
+      // Transform the database response to match our ScheduledPost interface
+      return (data || []).map(item => ({
+        id: item.id,
+        profile_id: item.profile_id,
+        content: item.content as { text: string; mediaUrls?: string[]; hashtags?: string[] },
+        scheduled_for: item.scheduled_for,
+        status: item.status as 'pending' | 'sent' | 'failed',
+        external_id: item.external_id,
+        error_message: item.error_message,
+        created_at: item.created_at,
+      }));
     },
     enabled: true,
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -43,7 +53,7 @@ export const useSchedulePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (postData: CreateScheduledPost & { scheduledFor: string }) => {
+    mutationFn: async (postData: { profile_id: string; content: { text: string; hashtags?: string[] }; scheduledFor: string }) => {
       console.log('Scheduling post:', postData);
 
       const { data, error } = await supabase.functions.invoke('schedule-post', {

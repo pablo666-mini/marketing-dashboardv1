@@ -277,6 +277,47 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_posts: {
+        Row: {
+          content: Json
+          created_at: string
+          error_message: string | null
+          external_id: string | null
+          id: string
+          profile_id: string
+          scheduled_for: string
+          status: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          error_message?: string | null
+          external_id?: string | null
+          id?: string
+          profile_id: string
+          scheduled_for: string
+          status?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          error_message?: string | null
+          external_id?: string | null
+          id?: string
+          profile_id?: string
+          scheduled_for?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "social_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_posts: {
         Row: {
           content_format: string | null
@@ -343,6 +384,47 @@ export type Database = {
           },
           {
             foreignKeyName: "social_posts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "social_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_profile_metrics: {
+        Row: {
+          created_at: string
+          engagement_rate: number | null
+          followers_count: number | null
+          id: string
+          impressions: number | null
+          profile_id: string
+          reach: number | null
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          id?: string
+          impressions?: number | null
+          profile_id: string
+          reach?: number | null
+          timestamp: string
+        }
+        Update: {
+          created_at?: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          id?: string
+          impressions?: number | null
+          profile_id?: string
+          reach?: number | null
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_profile_metrics_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "social_profiles"

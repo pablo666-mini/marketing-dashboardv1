@@ -238,7 +238,7 @@ export interface ProfilesByPlatform {
   [platform: string]: SocialProfile[];
 }
 
-// Gantt Timeline specific types
+// Post item for timeline
 export interface PostItem {
   id: string;
   postDate: string;
@@ -258,4 +258,107 @@ export interface TimelineStatus {
   id: string;
   name: string;
   color: string;
+}
+
+// Social Media Metrics Types
+export interface SocialProfileMetric {
+  id: string;
+  profile_id: string;
+  timestamp: string;
+  followers_count: number | null;
+  engagement_rate: number | null;
+  impressions: number | null;
+  reach: number | null;
+  created_at: string;
+}
+
+export interface CreateSocialProfileMetric {
+  profile_id: string;
+  timestamp: string;
+  followers_count?: number;
+  engagement_rate?: number;
+  impressions?: number;
+  reach?: number;
+}
+
+// Scheduled Posts Types
+export interface ScheduledPost {
+  id: string;
+  profile_id: string;
+  content: {
+    text: string;
+    mediaUrls?: string[];
+    hashtags?: string[];
+  };
+  scheduled_for: string;
+  status: 'pending' | 'sent' | 'failed';
+  external_id: string | null;
+  error_message: string | null;
+  created_at: string;
+}
+
+export interface CreateScheduledPost {
+  profile_id: string;
+  content: {
+    text: string;
+    mediaUrls?: string[];
+    hashtags?: string[];
+  };
+  scheduled_for: string;
+}
+
+export interface UpdateScheduledPost {
+  status?: 'pending' | 'sent' | 'failed';
+  external_id?: string;
+  error_message?: string;
+}
+
+// API Request/Response Types
+export interface FetchMetricsRequest {
+  profileId: string;
+}
+
+export interface FetchMetricsResponse {
+  success: boolean;
+  message: string;
+  data?: SocialProfileMetric[];
+}
+
+export interface SchedulePostRequest {
+  profileId: string;
+  content: {
+    text: string;
+    mediaUrls?: string[];
+    hashtags?: string[];
+  };
+  scheduledFor: string;
+}
+
+export interface SchedulePostResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    id: string;
+    external_id?: string;
+  };
+}
+
+// Chart Data Types
+export interface MetricChartData {
+  timestamp: string;
+  followers_count?: number;
+  engagement_rate?: number;
+  impressions?: number;
+  reach?: number;
+}
+
+export interface ProfileMetricsSummary {
+  profileId: string;
+  profileName: string;
+  platform: Platform;
+  currentFollowers: number;
+  followersChange: number;
+  engagementRate: number;
+  engagementChange: number;
+  sparklineData: MetricChartData[];
 }

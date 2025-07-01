@@ -14,16 +14,7 @@ import { ProductsOverviewCard } from '@/components/ProductsOverviewCard';
 import { ProtocolsOverviewCard } from '@/components/ProtocolsOverviewCard';
 import { MediaKitOverviewCard } from '@/components/MediaKitOverviewCard';
 import { ProductsManagementTab } from '@/components/ProductsManagementTab';
-import { 
-  GanttProvider, 
-  GanttSidebar, 
-  GanttTimeline, 
-  GanttHeader, 
-  GanttFeatureListGroup, 
-  GanttFeatureItem, 
-  GanttToday 
-} from '@/components/ui/gantt';
-import type { Product, GanttFeature } from '@/types';
+import type { Product } from '@/types';
 import LaunchTimeline from '@/components/LaunchTimeline';
 
 const GeneralInfo = () => {
@@ -63,21 +54,6 @@ const GeneralInfo = () => {
   const handleCloseCreateForm = () => {
     setShowCreateProductForm(false);
   };
-
-  // Transform launches data for Gantt component
-  const ganttFeatures: GanttFeature[] = launches?.map(launch => ({
-    id: launch.id,
-    name: launch.name,
-    startAt: new Date(launch.startDate),
-    endAt: new Date(launch.endDate),
-    status: launch.status,
-    posts: launch.posts.map(post => ({
-      id: post.id,
-      name: `Post`,
-      postDate: new Date(post.postDate),
-      profileIds: post.profileIds
-    }))
-  })) || [];
 
   return (
     <div className="space-y-6">
@@ -121,36 +97,13 @@ const GeneralInfo = () => {
             {launchesLoading ? (
               <Skeleton className="h-[400px] w-full" />
             ) : launches && launches.length > 0 ? (
-              <div className="flex border rounded-lg bg-white h-[500px]">
-                <GanttProvider features={ganttFeatures} range="monthly" zoom={100}>
-                  <GanttSidebar>
-                    {launches.map(launch => (
-                      <GanttFeatureListGroup key={launch.id} name={launch.name}>
-                        <GanttFeatureItem
-                          id={launch.id}
-                          name={launch.name}
-                          startAt={new Date(launch.startDate)}
-                          endAt={new Date(launch.endDate)}
-                          status={launch.status}
-                          posts={launch.posts.map(post => ({
-                            id: post.id,
-                            name: 'Post',
-                            postDate: new Date(post.postDate),
-                            profileIds: post.profileIds
-                          }))}
-                        />
-                      </GanttFeatureListGroup>
-                    ))}
-                  </GanttSidebar>
-                  <div className="flex-1 flex flex-col">
-                    <GanttHeader />
-                    <div className="flex-1 relative">
-                      <GanttTimeline>
-                        <GanttToday />
-                      </GanttTimeline>
-                    </div>
-                  </div>
-                </GanttProvider>
+              <div className="border rounded-lg p-8 text-center bg-gray-50">
+                <p className="text-muted-foreground mb-4">
+                  Timeline de {launches.length} lanzamientos disponibles
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Usa la pestaña "Timeline" para ver la vista detallada del calendario
+                </p>
               </div>
             ) : (
               <div className="border rounded-lg p-8 text-center bg-gray-50">

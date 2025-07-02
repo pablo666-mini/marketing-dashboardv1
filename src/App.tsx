@@ -8,6 +8,8 @@ import Layout from "./components/Layout";
 import Posts from "./pages/Posts";
 import Calendar from "./pages/Calendar";
 import Profiles from "./pages/Profiles";
+import ProfileMetrics from "./pages/ProfileMetrics";
+import MetricsDashboard from "./pages/MetricsDashboard";
 import GeneralInfo from "./pages/GeneralInfo";
 import Launches from "./pages/Launches";
 import LaunchDetail from "./pages/LaunchDetail";
@@ -27,6 +29,8 @@ const App = () => (
             <Route path="publicaciones" element={<Posts />} />
             <Route path="calendario" element={<Calendar />} />
             <Route path="perfiles" element={<Profiles />} />
+            <Route path="perfiles/:id" element={<ProfileMetrics />} />
+            <Route path="metricas" element={<MetricsDashboard />} />
             <Route path="lanzamientos" element={<Launches />} />
             <Route path="lanzamientos/:id" element={<LaunchDetail />} />
             <Route path="*" element={<NotFound />} />

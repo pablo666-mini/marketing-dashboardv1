@@ -6,10 +6,11 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Platform, SocialProfile, PREDEFINED_PLATFORMS } from '@/types';
-import { Instagram, Linkedin, Youtube, ExternalLink, Users, TrendingUp, Heart } from 'lucide-react';
+import { Instagram, Linkedin, Youtube, ExternalLink, Users, TrendingUp, Heart, BarChart3 } from 'lucide-react';
 import { CreateProfileDialog } from '@/components/CreateProfileDialog';
 import { EditProfileDialog } from '@/components/EditProfileDialog';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Profiles = () => {
   const { data: profiles, isLoading } = useSocialProfiles();
@@ -89,7 +90,15 @@ const Profiles = () => {
             Gestiona las cuentas oficiales de Miniland en redes sociales
           </p>
         </div>
-        <CreateProfileDialog />
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link to="/metricas">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Dashboard Métricas
+            </Link>
+          </Button>
+          <CreateProfileDialog />
+        </div>
       </div>
 
       {/* Summary Card */}
@@ -217,6 +226,12 @@ const Profiles = () => {
                     </div>
                     
                     <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/perfiles/${profile.id}`}>
+                          <BarChart3 className="h-4 w-4 mr-1" />
+                          Métricas
+                        </Link>
+                      </Button>
                       <EditProfileDialog profile={profile} />
                       <Switch
                         checked={profile.active}

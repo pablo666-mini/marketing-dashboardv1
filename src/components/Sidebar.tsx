@@ -9,6 +9,7 @@ import {
   Calendar,
   Users,
   Rocket,
+  BarChart3,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -37,7 +38,13 @@ const Sidebar = () => {
       name: "Perfiles Sociales",
       href: "/perfiles",
       icon: Users,
-      current: location.pathname === "/perfiles",
+      current: location.pathname === "/perfiles" || location.pathname.startsWith("/perfiles/"),
+    },
+    {
+      name: "Dashboard Métricas",
+      href: "/metricas",
+      icon: BarChart3,
+      current: location.pathname === "/metricas",
     },
     {
       name: "Gestión de Lanzamientos",

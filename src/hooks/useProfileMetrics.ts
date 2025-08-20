@@ -93,12 +93,11 @@ export const useAllProfilesLatestMetrics = () => {
 
         if (profilesError) {
           console.error('Error fetching profiles:', profilesError);
-          // Return mock data for preview
-          return generateMockProfilesData();
+          throw profilesError;
         }
 
         if (!profiles || profiles.length === 0) {
-          return generateMockProfilesData();
+          return [];
         }
 
         // Get latest metrics for each profile
